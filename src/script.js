@@ -24,6 +24,10 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Entry title
+const title = document.querySelector('div.entrytitle');
+window.setTimeout(() => {title.remove();},4000);
+
 /**
  * Overlay
  */
@@ -49,12 +53,13 @@ const loadingManager = new THREE.LoadingManager(
     {
         window.setTimeout(()=>
         {
-            gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 3, value: 0 })
-        }, 500)
+            gsap.to(overlayMaterial.uniforms.uAlpha, {duration: 2, value: 0 })
+            document.body.classList.add('grabbable');
+        }, 1000)
         window.setTimeout(()=>
         {
-            sceneReady = true
-        }, 500)
+            sceneReady = true;
+        }, 1500)
         
     }
 )
@@ -79,20 +84,28 @@ bakedTexture.encoding = THREE.sRGBEncoding
  * Materials
  */
 // Baked material
-const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
+// const bakedMaterial = new THREE.MeshBasicMaterial({ map: bakedTexture })
 
-gltfLoader.load(
-    '/models/moonrender.glb',
-    (gltf) =>
-    {
-        gltf.scene.traverse((child)=>
-        {
-            child.material = bakedMaterial
-        })
-        scene.add(gltf.scene)
-    }
+// gltfLoader.load(
+//     '/models/moonrender.glb',
+//     (gltf) =>
+//     {
+//         gltf.scene.traverse((child)=>
+//         {
+//             child.material = bakedMaterial
+//         })
+//         scene.add(gltf.scene)
+//     }
+// )
+
+const moon = new THREE.Mesh( 
+    new THREE.SphereGeometry(1, 64, 64),
+    new THREE.MeshStandardMaterial({ 
+        map: bakedTexture,
+    })
 )
 
+scene.add(moon)
 
 
 /**
@@ -100,51 +113,56 @@ gltfLoader.load(
  */
 const Radius = 1.01
 
-function addPoint (n) {
-    const pointDiv = document.createElement("div");
-    pointDiv.className = "point point-" + String(n);
+const pointContainer = document.createElement("div");
+pointContainer.className="pointContainer";
 
+// return onclick function to make navbar visible
+function navOnOff(){
+    const nav = document.querySelector('.navbar');
+    nav.classList.toggle('visible');
+    document.body.classList.toggle('grabbable');
+}
+window.navOnOff=navOnOff;
+
+const points = fl.map((d,i)=>{
+
+    // Create point
+    const pointDiv = document.createElement("div");
+    pointDiv.className = `point point-${i}`;
+    pointDiv.onclick = navOnOff;
+
+    // Create circled number
     const labelDiv = document.createElement("div");
     labelDiv.className = "label"
-    labelDiv.textContent = String(n + 1);
+    labelDiv.textContent = String(i + 1);
     pointDiv.appendChild(labelDiv);
 
+    // Create text description
     const textDiv = document.createElement("div");
     textDiv.className = "text"
-    textDiv.textContent = fl[n].name;
+    textDiv.innerHTML = `<div>${d.name}</div>`;
     pointDiv.appendChild(textDiv);
 
-    const currentDiv = document.getElementById("point point-" + String(n-1));
-    document.body.insertBefore(pointDiv, currentDiv);
-  }
-
-for (let i = 1; i < fl.length; i++) {
-    addPoint(i)
+    pointContainer.appendChild(pointDiv);
     
-}
+    return {  
+        //lonlat2cart(radius, latitude (N=+, S=-) , longitude (E=+, W=-))
+        position: lonlat2cart(Radius, d.lat, d.lon),
+        element: pointDiv,
+    };
+
+});
+
+document.body.appendChild(pointContainer);
 
 const raycaster = new Raycaster()
-//converToCartesian(radius, latitude (N=+, S=-) , longitude (E=+, W=-))
-const points = [
-    {   // 폭풍의 대양
-        position: lonlat2cart(Radius, fl[0].lat, fl[0].lon),
-        element: document.querySelector('.point-0')
-    }
-]
-for (let i = 1; i < fl.length; i++) {
-    points.push(
-        {  
-            position: lonlat2cart(Radius, fl[i].lat, fl[i].lon),
-            element: document.querySelector('.point-' + String(i))
-        }
-    )
-    
-}
+
 
 /**
  * Lights
  */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
+//const ambientLight = new THREE.AmbientLight(0xffffff, 0.1)
+const ambientLight = new THREE.AmbientLight(0xffffff, 1)
 scene.add(ambientLight)
 
 const directionalLight = new THREE.DirectionalLight(0xffffff, 0.1)
@@ -160,6 +178,7 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
+console.log(sizes)
 
 window.addEventListener('resize', () =>
 {
@@ -168,9 +187,15 @@ window.addEventListener('resize', () =>
     sizes.height = window.innerHeight
 
     // Update camera
+    camdist=( sizes.width>sizes.height ? 2.5 : 2.5 * sizes.height/sizes.width);
+    camera.position.set(camdist, 0, 0);
     camera.aspect = sizes.width / sizes.height
     camera.updateProjectionMatrix()
-
+    
+    // Update controls
+    controls.maxDistance = 1.1 * camdist;
+    controls.minDistance = Math.max(2, 0.5 * camdist);
+    
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
@@ -180,16 +205,20 @@ window.addEventListener('resize', () =>
  * Camera
  */
 // Base camera
+let camdist=( sizes.width>sizes.height ? 2.5 : 2.5 * sizes.height/sizes.width);
 const camera = new THREE.PerspectiveCamera(50, sizes.width / sizes.height, 0.1, 10)
-camera.position.set(2, 0, 2)
+camera.position.set(camdist, 0, 0)
 scene.add(camera)
 
 // Controls
 const controls = new OrbitControls(camera, canvas)
 controls.target.set(0, 0, 0)
 controls.enableDamping = true
-controls.maxDistance = 10
-controls.minDistance = 1.5
+controls.enablePan = false;
+controls.maxDistance = 1.1 * camdist;
+controls.minDistance = Math.max(2, 0.5 * camdist);
+controls.maxPolarAngle = Math.PI * 3/4;
+controls.minPolarAngle = Math.PI /4;
 
 /**
  * Renderer
@@ -217,6 +246,7 @@ const tick = () =>
 
     if(sceneReady)
     {
+        
         // Go through each point
         for(const point of points)
         {
@@ -231,6 +261,7 @@ const tick = () =>
                 point.element.classList.add('visible')
             }
             else{
+
                 const intersectionDistance = intersects[0].distance
                 const pointDistance = point.position.distanceTo(camera.position)
 
@@ -239,7 +270,7 @@ const tick = () =>
                     point.element.classList.remove('visible')
                 }
                 else
-                {
+                { 
                     point.element.classList.add('visible')
                 }
             
@@ -263,3 +294,32 @@ const tick = () =>
 }
 
 tick()
+
+
+
+/**
+ * Keyboard Controls
+ */
+
+// escape key to navbar not visible
+document.addEventListener('keydown', (event) => {
+    if(event.key === 'Escape') {
+        const nav = document.querySelector('.navbar');
+        nav.classList.remove('visible');
+        document.body.classList.toggle('grabbable');
+    }
+});
+
+// function enter(){
+//     window.location.href = 'login.html';
+// };
+
+// document.querySelector('.login').onclick = 
+
+// function enter(event) {
+//     if(event.key === 'Enter') {
+//         const nav = document.querySelector('.navbar');
+//         nav.classList.add('visible');
+//         document.body.classList.toggle('grabbable');
+//     }
+// }

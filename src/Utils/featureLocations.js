@@ -5,7 +5,7 @@ export const fl = [
 	{ name: "Gusev Crater (Spirit,2004)", lat:  -14.5, lon:  175.4 },
     
 	
-	{ name: "Olympus Mons(largest known mountain in Solar System)", lat: 18.65, lon: 226.2},
+	{ name: "Olympus Mons (largest known mountain in Solar System)", lat: 18.65, lon: 226.2},
 	{ name: "Arsia Mons", lat: -8.4, lon: 239.91},
 	{ name: "Pavonis Mons",	lat: 1.48, lon: 247.04},
 	{ name: "Alba Mons",	lat: 41.1, lon: 249.3},
