@@ -178,7 +178,6 @@ const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
 }
-console.log(sizes)
 
 window.addEventListener('resize', () =>
 {
@@ -322,4 +321,13 @@ document.addEventListener('keydown', (event) => {
 //         nav.classList.add('visible');
 //         document.body.classList.toggle('grabbable');
 //     }
+// }
+
+document.getElementById('bgmusic').volume = 0.1;
+document.addEventListener('click', function() { document.getElementById('bgmusic').play() }, { once: true });
+
+// document.addEventListener('click', musicPlay);
+// function musicPlay() {
+//     document.getElementById('ID').play();
+//     document.removeEventListener('click', musicPlay);
 // }
