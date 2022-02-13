@@ -93,7 +93,17 @@ module.exports = {
                 // {
                 //     filename: 'assets/images/[hash][ext]'
                 // }
-            }
+            },
+
+            // Audio files
+            {
+                test: /\.(mp3|wav|ogg|m4a)$/,
+                type: 'asset/resource',
+                generator:
+                {
+                    filename: 'assets/audio/[hash][ext]'
+                }
+            },
         ]
     }
 }
