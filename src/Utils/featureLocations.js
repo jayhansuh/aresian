@@ -19,5 +19,5 @@ export const fl = [
 	{ name: "Huygens crater", lat: -13.96, lon: 55.58},
 	{ name: "Jezero Crater (Preseverance,2021)", lat:  18.38, lon:  77.58 },
     //{ name: "Oyama Crater", lat:  23.57, lon:  339.89 },
-	//{ name: "Tharsis Tholus",	lat: 13.41, lon: 269.31},
+	//{ name: "Tharsis Tholus",	lat: 13.41, lon: 269.31 },
 ];

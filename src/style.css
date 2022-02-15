@@ -214,6 +214,24 @@ img{
     right:5vw;
 }
 
+
+.button-right-top.setting{
+    /* background: gray; */
+    transform: translate(36px,0) scaleX(0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 128px;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.button-right-top.setting.visible{
+    opacity: 1;
+    transform: translate(-27px,0) scaleX(1);
+}
+
 .button-right-top:hover{
     color: var(--linkcolor);
     cursor: pointer;
@@ -230,6 +248,7 @@ img{
 .marbutton{
     flex-grow: 1;
     border-radius: 5pt;
+    height: 40px;
     /* background: var(--darkmartian); */
     background: #fff2;
     border: 2px solid var(--darkmartian);

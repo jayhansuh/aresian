@@ -9,25 +9,51 @@
     rel="stylesheet">
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-
-    <title>ARESIAN</title>
+    <link rel="icon" href="./img/favicon.svg" type="image/svg+xml">
+    <title>ARESIAN(Mars Geography Simulator)</title>
 
 
 </head>
 <body>
-    <audio id="bgmusic" ref="player" autoplay volume="0.1"> <!--loop-->
+    <audio id="bgmusic" ref="player" volume="0.1">
         <source src="./music/angelic_circles.mp3" type="audio/mp3">
     </audio>
-
-    <!-- <embed src="./music/watermarked_Stephen_Keech_The_Part_Where_Things_Start_To_Change_instrumental_3_20.mp3" loop="true" autostart="true" width="2" height="0">
-    </embed> -->
-
+    
     <canvas class="webgl"></canvas>
     <div class="loading-bar"></div>
+
+    <div style="color:gray">
+        <div class="button-right-top" onclick="window.settingOnOff()">
+            <span class="material-icons">settings</span>
+        </div>
+        
+        <div class="button-right-top setting">
+            <div style="height: 28px;">
+                <span id="volume_button" class="material-icons" onclick="window.volumeOnOff();" >volume_up</span>
+            </div>
     
-    <div class="entrytitle properText">
-        <div>ARESIAN</div>
+            <div class="button-bar">
+                <button class="marbutton" onclick="window.marsTexture('TER');">
+                    <span class="marbutton__label">
+                        TER
+                    </span>
+                </button>
+                <button class="marbutton" onclick="window.marsTexture('GRE');">
+                    <span class="marbutton__label">
+                        GRE
+                    </span>
+                </button>
+                <button class="marbutton" onclick="window.marsTexture('ELE');">
+                    <span class="marbutton__label">
+                        ELE
+                    </span>
+                </button>
+            </div>
+        </div> 
+
     </div>
+
+    
 
     <div class="navbar">
         <!-- esacpe button -->
@@ -38,7 +64,7 @@
         <!-- sample image div -->
         <div class="navbar-item">
             <div class="navbar-item-image">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Topographic_Map_of_Gale_Crater.jpg/1024px-Topographic_Map_of_Gale_Crater.jpg" alt="sample image">
+                <img src="./img/Topographic_Map_of_Gale_Crater.jpg.webp" alt="sample image">
             </div>
         </div>
         <div class=navbar-item>

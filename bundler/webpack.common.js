@@ -3,8 +3,16 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 
+const pages = ["script","test"];
+
 module.exports = {
     entry: path.resolve(__dirname, '../src/script.js'),
+    
+    // entry: pages.reduce((config, page) => {
+    //     config[page] = `./src/${page}.js`;
+    //     return config;
+    //   }, {}),
+
     output:
     {
         hashFunction: 'xxhash64',
@@ -60,7 +68,7 @@ module.exports = {
 
             // Images
             {
-                test: /\.(jpg|png|gif|svg)$/,
+                test: /\.(jpg|png|gif|svg|jpeg)$/,
                 type: 'asset/resource',
                 generator:
                 {
