@@ -7,6 +7,7 @@ module.exports = {
     entry: {
         main: path.resolve(__dirname, '../src/script.js'),
         marscalendar: path.resolve(__dirname, '../src/marscalendar/marscalendar.js'),
+        aeolis: path.resolve(__dirname, '../src/aeolis/script.js'),
     },
 
     output:
@@ -36,9 +37,16 @@ module.exports = {
             cache : true,
         }),
         new HtmlWebpackPlugin({
-            filename: '[name]/index.html',
+            filename: 'marscalendar/index.html',
             template: path.resolve(__dirname, '../src/marscalendar/marscalendar.html'),
             chunks: ['marscalendar'],
+            minify: true,
+            cache : true,
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'aeolis/index.html',
+            template: path.resolve(__dirname, '../src/aeolis/index.html'),
+            chunks: ['aeolis'],
             minify: true,
             cache : true,
         }),
