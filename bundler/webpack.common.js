@@ -3,22 +3,24 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 
-const pages = ["script","test"];
-
 module.exports = {
-    entry: path.resolve(__dirname, '../src/script.js'),
-    
-    // entry: pages.reduce((config, page) => {
-    //     config[page] = `./src/${page}.js`;
-    //     return config;
-    //   }, {}),
+    entry: {
+        main: path.resolve(__dirname, '../src/script.js'),
+        marscalendar: path.resolve(__dirname, '../src/marscalendar/marscalendar.js'),
+        aeolis: path.resolve(__dirname, '../src/aeolis/script.js'),
+    },
 
     output:
     {
         hashFunction: 'xxhash64',
-        filename: 'bundle.[contenthash].js',
+        filename: '[name].bundle.[contenthash].js',
         path: path.resolve(__dirname, '../dist')
     },
+    
+    optimization: {
+        runtimeChunk: 'single',
+    },
+
     devtool: 'source-map',
     plugins:
     [
@@ -28,8 +30,25 @@ module.exports = {
             ]
         }),
         new HtmlWebpackPlugin({
+            filename: 'index.html',
             template: path.resolve(__dirname, '../src/index.html'),
-            minify: true
+            chunks: ['main'],
+            minify: true,
+            cache : true,
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'marscalendar/index.html',
+            template: path.resolve(__dirname, '../src/marscalendar/marscalendar.html'),
+            chunks: ['marscalendar'],
+            minify: true,
+            cache : true,
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'aeolis/index.html',
+            template: path.resolve(__dirname, '../src/aeolis/index.html'),
+            chunks: ['aeolis'],
+            minify: true,
+            cache : true,
         }),
         new MiniCSSExtractPlugin()
     ],
