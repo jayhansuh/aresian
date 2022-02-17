@@ -3,32 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moon Rendering</title>
+    <!-- <style name="Theme.MyApp" parent="Theme.Material3.DayNight.NoActionBar">
+    </style> -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet">
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="icon" href="./img/favicon.svg" type="image/svg+xml">
+    <title>ARESIAN(Mars Geography Simulator)</title>
+
 </head>
 <body>
+    <audio id="bgmusic" ref="player" volume="0.1">
+        <source src="./music/angelic_circles.mp3" type="audio/mp3">
+    </audio>
+    
     <canvas class="webgl"></canvas>
     <div class="loading-bar"></div>
 
-    <div class="point point-0">
-        <div class="label"> 1 </div>
-        <div class="text"> Aeolis Palus(Curisosity,2012) </div>
-    </div>
-    <!--<div class="point point-1">
-        <div class="label"> 2 </div>
-        <div class="text"> 고요의 바다 </div>
-    </div>
-    <div class="point point-2">
-        <div class="label"> 3 </div>
-        <div class="text"> 평온의 바다 </div>
-    </div>
-    <div class="point point-3">
-        <div class="label"> 4 </div>
-        <div class="text"> 풍요의 바다 </div>
-    </div>
-    <div class="point point-4">
-        <div class="label"> 5 </div>
-        <div class="text"> 위난의 바다 </div>
-    </div> -->
+    <div style="color:gray">
+        <div class="button-right-top" onclick="window.settingOnOff()">
+            <span class="material-icons">settings</span>
+        </div>
+        
+        <div class="button-right-top setting">
+            <div style="height: 28px;">
+                <span id="volume_button" class="material-icons" onclick="window.volumeOnOff();" >volume_up</span>
+            </div>
+    
+            <div class="button-bar">
+                <button class="marbutton" onclick="window.marsTexture('TER');">
+                    <span class="marbutton__label">
+                        TER
+                    </span>
+                </button>
+                <button class="marbutton" onclick="window.marsTexture('GRE');">
+                    <span class="marbutton__label">
+                        GRE
+                    </span>
+                </button>
+                <button class="marbutton" onclick="window.marsTexture('ELE');">
+                    <span class="marbutton__label">
+                        ELE
+                    </span>
+                </button>
+            </div>
+        </div> 
 
+    </div>
+
+    
+
+    <div class="navbar">
+        <!-- esacpe button -->
+        <div class="button-right-top" onclick="window.navOnOff();">
+            <span class="material-icons">close</span>
+        </div>
+
+        <!-- sample image div -->
+        <div class="navbar-item">
+            <div class="navbar-item-image">
+                <img src="./img/Topographic_Map_of_Gale_Crater.jpg.webp" alt="sample image">
+            </div>
+        </div>
+        <div class=navbar-item>
+            <div class="properText">Aeolis City</div>
+            <div class="button-bar">
+                <button class="marbutton" onClick="window.location.href = '/aeolis';">
+                    <span class="material-icons" style="align-self: center;margin: 0 5px 0 0;">
+                        input
+                    </span>
+                    <span class="marbutton__label">
+                        ENTER
+                    </span>
+                </button>
+            </div>
+            <div>
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+            </div>    
+        </div>
+    </div>
 </body>
 </html>

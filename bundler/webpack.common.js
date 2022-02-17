@@ -4,13 +4,23 @@ const MiniCSSExtractPlugin = require('mini-css-extract-plugin')
 const path = require('path')
 
 module.exports = {
-    entry: path.resolve(__dirname, '../src/script.js'),
+    entry: {
+        main: path.resolve(__dirname, '../src/script.js'),
+        marscalendar: path.resolve(__dirname, '../src/marscalendar/marscalendar.js'),
+        aeolis: path.resolve(__dirname, '../src/aeolis/script.js'),
+    },
+
     output:
     {
         hashFunction: 'xxhash64',
-        filename: 'bundle.[contenthash].js',
+        filename: '[name].bundle.[contenthash].js',
         path: path.resolve(__dirname, '../dist')
     },
+    
+    optimization: {
+        runtimeChunk: 'single',
+    },
+
     devtool: 'source-map',
     plugins:
     [
@@ -20,8 +30,25 @@ module.exports = {
             ]
         }),
         new HtmlWebpackPlugin({
+            filename: 'index.html',
             template: path.resolve(__dirname, '../src/index.html'),
-            minify: true
+            chunks: ['main'],
+            minify: true,
+            cache : true,
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'marscalendar/index.html',
+            template: path.resolve(__dirname, '../src/marscalendar/marscalendar.html'),
+            chunks: ['marscalendar'],
+            minify: true,
+            cache : true,
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'aeolis/index.html',
+            template: path.resolve(__dirname, '../src/aeolis/index.html'),
+            chunks: ['aeolis'],
+            minify: true,
+            cache : true,
         }),
         new MiniCSSExtractPlugin()
     ],
@@ -60,7 +87,7 @@ module.exports = {
 
             // Images
             {
-                test: /\.(jpg|png|gif|svg)$/,
+                test: /\.(jpg|png|gif|svg|jpeg)$/,
                 type: 'asset/resource',
                 generator:
                 {
@@ -93,7 +120,17 @@ module.exports = {
                 // {
                 //     filename: 'assets/images/[hash][ext]'
                 // }
-            }
+            },
+
+            // Audio files
+            {
+                test: /\.(mp3|wav|ogg|m4a)$/,
+                type: 'asset/resource',
+                generator:
+                {
+                    filename: 'assets/audio/[hash][ext]'
+                }
+            },
         ]
     }
 }
