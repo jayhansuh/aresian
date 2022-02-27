@@ -1,4 +1,6 @@
 [[headers]]
-  for = "/models/*"
+  for = "/*"
   [headers.values]
-  cache-control = "public, max-age=86400"
+  cache-control = "public, max-age=604800, stale-while-revalidate=86400"
+  X-Frame-Options = "DENY"
+  X-XSS-Protection = "1; mode=block"
