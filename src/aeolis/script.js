@@ -6,7 +6,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import * as dat from 'lil-gui'
 import Stats from 'stats.js'
-import { Sphere, Vector3 } from 'three';
+import { Sphere, Vector2, Vector3 } from 'three';
 
 /**
  * Stats
@@ -79,121 +79,58 @@ const scale = 2000
     }
 )
 
-/**
- * Me Sphere
- */
-const hoverHeight = 35;
-const objectMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
-const objectGeometry = new THREE.SphereGeometry(1, 10, 10)
-const objectSphere = new THREE.Mesh( objectGeometry, objectMaterial)
-//objectSphere.position.set(0.5, 30, 0.75)
-objectSphere.position.set(
--4050.380443864049,
--2354.1899660890926 + hoverHeight,
--8434.64537256541)
-Sphere.castShadow = true
-scene.add( objectSphere )
 
 
 /**
- * Models
+ * Kapi Model
  */
-// const dracoLoader = new DRACOLoader()
-// dracoLoader.setDecoderPath('/draco/')
- 
- //const gltfLoader = new GLTFLoader()
- //gltfLoader.setDRACOLoader(dracoLoader)
- 
- let mixer = null
- let capybaraAnimation
- let action
- let capibaraScene
- 
- gltfLoader.load(
-     '/models/capybara.glb',
-     (gltf) =>
-     {
-         capibaraScene = gltf.scene
-         capybaraAnimation = gltf.animations
+
+const pos2d = new Vector2(-4050.380443864049, -8434.64537256541);
+const maxHeight = 4000;
+
+let mixer = null
+let capybaraAnimation
+let action
+let capibaraScene
+
+gltfLoader.load(
+    '/models/capybara.glb',
+    (gltf) =>
+    {
+        capibaraScene = gltf.scene
+        capybaraAnimation = gltf.animations
          
-         capibaraScene.scale.set(1, 1, 1)
-         capibaraScene.position.set(objectSphere.position.x, objectSphere.position.y - hoverHeight, objectSphere.position.z)
+        capibaraScene.scale.set(1, 1, 1)
+        capibaraScene.position.set(pos2d.x, -2363.1899660890917 , pos2d.y)
  
-         scene.add(capibaraScene)
+        scene.add(capibaraScene)
  
-         // Animation
-         mixer = new THREE.AnimationMixer(capibaraScene)
-         action = mixer.clipAction(capybaraAnimation[1])
-         action.play()
-     }
- )
- 
- 
-//  let animation = debug_GUI.add(debugObject, 
-//      'animation', 
-//      ['idle', 'rest', 'explore', 'walk', 'run'])
-//      .listen();
- 
-//  animation.onChange(()=>{
-//      if(debugObject.animation == "idle"){
-//          action.stop()
-//          action = mixer.clipAction(capybaraAnimation[1])
-//          action.play()
-//      }
-//      if(debugObject.animation == "rest"){
-//          action.stop()
-//          action = mixer.clipAction(capybaraAnimation[2])
-//          action.play()
-//      }
-//      if(debugObject.animation == "explore"){
-//          action.stop()
-//          action = mixer.clipAction(capybaraAnimation[0])
-//          action.play()
-//      }
-//      if(debugObject.animation == "run"){
-//          action.stop()
-//          action = mixer.clipAction(capybaraAnimation[3])
-//          action.play()
-//      }
-//      if(debugObject.animation == "walk"){
-//          action.stop()
-//          action = mixer.clipAction(capybaraAnimation[4])
-//          action.play()
-//      }
- 
- 
-//  })
+        // Animation
+        mixer = new THREE.AnimationMixer(capibaraScene)
+        action = mixer.clipAction(capybaraAnimation[1])
+        action.play()
+    }
+)
 
 /**
- * Foot Sphere
+ * Beacon
  */
-//  const objectMaterial2 = new THREE.MeshBasicMaterial({ color: 0xffffff })
-//  const objectGeometry2 = new THREE.SphereGeometry(1, 10, 10)
-//  const objectSphere2 = new THREE.Mesh( objectGeometry2, objectMaterial2)
-//  objectSphere2.position.set(objectSphere.position.x, objectSphere.position.y - 20, objectSphere.position.z)
-//  scene.add( objectSphere2 )
 
+const beaconHeight = 35;
+
+const beaconMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff })
+const beaconGeometry = new THREE.SphereGeometry(1, 4, 2)
+const beaconMesh = new THREE.Mesh( beaconGeometry, beaconMaterial)
+beaconMesh.position.set(pos2d.x, -2363.1899660890917 + beaconHeight , pos2d.y)
+Sphere.castShadow = true
+scene.add( beaconMesh )
+ 
 /**
  * Lights
  */
-//const ambientLight = new THREE.AmbientLight(0xffffff, 0.0)
-//scene.add(ambientLight)
-//debugObject.ambientLightColor = 0xffffff
-// gui
-//     .addColor(debugObject, 'ambientLightColor')
-//     .onChange(()=>
-//     {
-//         ambientLight.color.set(debugObject.ambientLightColor)
-//     })
-//     .name('ambient light color')
-
-// gui.add(ambientLight, 'intensity').min(0).max(1).step(0.01).name('ambient light intensity')
-
-const hemisphereLight = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.3 );
+const hemisphereLight = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.6 );
 hemisphereLight.position.set( 0, 0, 0);
 scene.add( hemisphereLight );
-//const hemisphereLightHelper = new THREE.HemisphereLightHelper( hemisphereLight, 10000 );
-//scene.add( hemisphereLightHelper );
 debugObject.hemisphereLightColor = 0xffffff
 gui
     .addColor(debugObject, 'hemisphereLightColor')
@@ -205,7 +142,7 @@ gui
 
 gui.add(hemisphereLight, 'intensity').min(0).max(1).step(0.01).name('hemisphere light intensity')
 
-const directionalLight = new THREE.DirectionalLight(0xBEB4A2, 0.5)
+const directionalLight = new THREE.DirectionalLight(0xBEB4A2, 0.6)
 directionalLight.castShadow = true
 directionalLight.shadow.mapSize.set(1024, 1024)
 directionalLight.shadow.camera.far = 1000
@@ -214,8 +151,6 @@ directionalLight.shadow.camera.right = 1
 directionalLight.shadow.camera.bottom = 1
 directionalLight.position.set(0, 7000, 1000)
 scene.add(directionalLight)
-//const directionalLighthelper = new THREE.DirectionalLightHelper( directionalLight, 1000 );
-//scene.add( directionalLighthelper );
 debugObject.directionalLightColor = 0xBEB4A2
 gui
     .addColor(debugObject, 'directionalLightColor')
@@ -227,6 +162,7 @@ gui
 
 gui.add(directionalLight, 'intensity').min(0).max(1).step(0.01).name('directional light intensity')
 
+// spot light for sun
 let spotLight = new THREE.SpotLight( 0xffffff, .6 );
 spotLight.position.set( 0, 200, 200 );
 spotLight.position.multiplyScalar( 70 );
@@ -254,6 +190,38 @@ gui
     .name('spot light color')
 
 gui.add(spotLight, 'intensity').min(0).max(1).step(0.01).name('spot light intensity')
+
+// spot light for target
+let spotLight2 = new THREE.SpotLight( 0xffffff, 0.2 );
+spotLight2.angle = Math.PI / 16;
+spotLight2.penumbra = 0;
+spotLight2.decay = 0;
+spotLight2.distance = 2*beaconHeight;
+
+spotLight2.castShadow = true;
+spotLight2.shadow.mapSize.width = 512;
+spotLight2.shadow.mapSize.height = 512;
+spotLight2.shadow.camera.near = 10;
+spotLight2.shadow.camera.far = 200;
+spotLight2.shadow.focus = 1;
+
+scene.add( spotLight2 );
+
+// head light for kapi
+let spotLight3 = new THREE.SpotLight( 0xffffff, 6 );
+spotLight3.angle = Math.PI / 8;
+spotLight3.penumbra = 0.1;
+spotLight3.decay = 0;
+
+spotLight3.castShadow = true;
+spotLight3.shadow.mapSize.width = 512;
+spotLight3.shadow.mapSize.height = 512;
+spotLight3.shadow.camera.near = 10;
+spotLight3.shadow.camera.far = 200;
+spotLight3.shadow.focus = 1;
+
+scene.add( spotLight3 );
+
 
 /**
  * Sizes
@@ -288,11 +256,10 @@ window.addEventListener('mousemove', (_event)=>
     mouse.y = - (_event.clientY / sizes.height ) * 2 + 1
 })
 
-let letmove = false
+let mouseOnClick = false
 window.addEventListener('click', ()=>
 {
-    console.log(mouse)
-    letmove = true
+    mouseOnClick = true
 })
 
 
@@ -335,7 +302,7 @@ controls.touches = {
 	ONE: null,
 	TWO: THREE.TOUCH.ROTATE,//THREE.TOUCH.DOLLY_PAN
 }
-controls.target = objectSphere.position;
+controls.target = beaconMesh.position;
 
 /**
  * Background & Fog Colors debug GUI
@@ -354,7 +321,7 @@ gui
 
 //Fog
 const near = 100
-const far = 23000
+const far = 31000
 scene.fog = new THREE.Fog("#a3a8ae" , near , far );
 debugObject.fogColor = "#a3a8ae"
 gui
@@ -373,15 +340,15 @@ gui.add(scene.fog, 'far', near, far).listen().min(0).max(100000).step(0.01).name
  */
 const raycaster = new THREE.Raycaster()
 
-
 /**
  * Animate
  */
 const clock = new THREE.Clock()
 let previousTime = 0
-let phi=0;
-let vel= new Vector3(0,0,0);
-let target = null;
+let vel= new Vector2(0,0);
+let target2d = new Vector2(0,0);
+let kapiOnRun = 0;
+
 const tick = () =>
 {
     stats.begin()
@@ -399,37 +366,70 @@ const tick = () =>
         raycaster.setFromCamera(mouse, camera)
         const intersect = raycaster.intersectObject(galecrater)
 
-        if (letmove && intersect.length != 0)
+        if (mouseOnClick && intersect.length != 0)
         {
-            let collidingSurface = intersect[0].point
-            //objectSphere.position.set(collidingSurface.x, collidingSurface.y + 150, collidingSurface.z)   
-            target = collidingSurface.add(new Vector3(0,hoverHeight,0));
-            vel.set(target.x-objectSphere.position.x,target.y-objectSphere.position.y,target.z-objectSphere.position.z);
-            vel.normalize().multiplyScalar(20);
+            const collidingSurface = intersect[0].point
+            target2d = new THREE.Vector2(collidingSurface.x, collidingSurface.z );
+            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(200);
             
-            // rotate the object to orient it to the target
-            phi = Math.atan2(vel.z, vel.x);
-            capibaraScene.rotation.y = Math.PI/2- phi;
-            //capibaraScene.rotation.x = 0;
-            //capibaraScene.rotation.z = 0;
-            //capibaraScene.position.set(collidingSurface.x, collidingSurface.y + 150, collidingSurface.z)
-            action.stop()
-            action = mixer.clipAction(capybaraAnimation[3])
-            action.play()
+            // rotate the object to orient it to the target2d
+            const phi = Math.atan2(vel.y, vel.x);
+            if(phi){
+                capibaraScene.rotation.y = Math.PI/2- phi;
+            }
+            
+            pos2d.addScaledVector(vel, deltaTime);
+            raycaster.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
+            const intersect_vertical = raycaster.intersectObject(galecrater)
+            if( intersect_vertical && intersect_vertical.length != 0){
+                
+                spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
+                spotLight2.target.position.copy(intersect_vertical[0].point)
+                spotLight2.target.updateMatrixWorld();
+                spotLight2.intensity = 10;
+                
+                // kapi running animation
+                action.stop()
+                action = mixer.clipAction(capybaraAnimation[3])
+                action.play()
+                kapiOnRun = 2;
+            }
         }
-        letmove = false
-        if(target!=null){
-            objectSphere.position.set(objectSphere.position.x + deltaTime * vel.x, objectSphere.position.y + deltaTime * vel.y, objectSphere.position.z + deltaTime * vel.z)      
-            capibaraScene.position.set(objectSphere.position.x, objectSphere.position.y - hoverHeight, objectSphere.position.z)
-            if(objectSphere.position.distanceTo(target)<10){
-                //objectSphere.position.set(target.x, target.y, target.z)
-                //capibaraScene.position.set(objectSphere.position.x, objectSphere.position.y - 20, objectSphere.position.z)
-                console.log(objectSphere.position);
-                target = null;
+        mouseOnClick = false;
 
+        if(kapiOnRun>0){
+
+            pos2d.addScaledVector(vel, deltaTime);
+            raycaster.set(new THREE.Vector3(pos2d.x, maxHeight , pos2d.y), new THREE.Vector3(0,-1,0))
+            const intersect_vertical = raycaster.intersectObject(galecrater)
+            
+            if( pos2d.dot(vel) < target2d.dot(vel) && intersect_vertical && intersect_vertical.length != 0){
+                
+                const pos3d = intersect_vertical[0].point;
+                
+                capibaraScene.position.copy(pos3d);
+                beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
+                
+                // kapi walking animation
+                if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 100){
+                    vel.multiplyScalar(0.2);
+                    action.stop()
+                    action = mixer.clipAction(capybaraAnimation[4])
+                    action.play()
+                    kapiOnRun = 1;
+                    spotLight2.intensity = .3;
+                }
+            }
+            else {
                 action.stop()
                 action = mixer.clipAction(capybaraAnimation[1])
                 action.play()
+                kapiOnRun = 0;
+                spotLight2.intensity = 0;
+
+                spotLight3.position.copy(beaconMesh.position)
+                spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
+                spotLight3.target.updateMatrixWorld();
             }
         }
     }
@@ -438,7 +438,7 @@ const tick = () =>
     // phi= 0;
     // let newvec = new THREE.Vector3(0,10000,10000).applyAxisAngle(new THREE.Vector3(0,1,0), phi).add(objectSphere.position)
     // camera.position.set(newvec.x, newvec.y, newvec.z)
-    camera.lookAt(objectSphere.position)
+    //camera.lookAt(beaconMesh.position)
 
     // Model animation
     if(mixer)
