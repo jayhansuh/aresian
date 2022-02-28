@@ -20,6 +20,9 @@ const Color = require('color');
 const stats = new Stats()
 stats.showPanel(0)
 document.body.appendChild(stats.dom)
+stats.dom.style.position = 'absolute'
+stats.dom.style.left = '0px'
+stats.dom.style.top = 'calc(100% - 48px)'
 
 /**
  * Base
@@ -27,8 +30,10 @@ document.body.appendChild(stats.dom)
 // Debug
 const debugObject = {}
 const gui = new dat.GUI({
-    width: 300
+    width: 300,
 })
+gui.close();
+gui.domElement.id = 'gui'
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -143,10 +148,34 @@ gltfLoader.load(
 )
 
 /**
+ * Kapi House Model
+ */
+let kapiHouseScene;
+
+gltfLoader.load(
+    '/architect/soilhouse1.glb',
+    (gltf) =>
+    {
+        kapiHouseScene = gltf.scene
+         
+        kapiHouseScene.scale.set(.3, .3, .3)
+        kapiHouseScene.position.set(pos2d.x, -2118.8256403156556 -1, pos2d.y -10)
+        kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+        kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
+        // for(let i =0 ; i< kapiHouseScene.children.length ; i++){   
+        //     kapiHouseScene.children[i].position.set(pos2d.x - 100 *i , -2118.8256403156556 +10, pos2d.y);
+        //     console.log(kapiHouseScene.children[i])
+        //     scene.add(kapiHouseScene.children[i])
+        // }
+        scene.add(kapiHouseScene)
+    }
+)
+
+/**
  * Beacon
  */
 
-const beaconHeight = 12;
+let beaconHeight = 8;
 
 const beaconMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 const beaconGeometry = new THREE.SphereGeometry(0.5, 4, 2)
@@ -156,8 +185,6 @@ beaconMesh.position.set(pos2d.x, -2118.8256403156556 + beaconHeight , pos2d.y)
 Sphere.castShadow = true
 beaconMesh.layers.enable(1);
 scene.add( beaconMesh )
-
-const ambientlight = new THREE.AmbientLight(0xffffff, 100);
 
  
 
@@ -172,9 +199,9 @@ sunMesh.position.set(0, sunDistance, 0)
 sunMesh.layers.enable(1);
 scene.add( sunMesh )
 
+const ambientlight = new THREE.AmbientLight(0xffffff, 100);
 ambientlight.layers.set(1);
 scene.add(ambientlight);
-
 
 debugObject.sunAngularRadius = 0.1765 * 2;
 gui
@@ -217,7 +244,7 @@ directionalLight.shadow.camera.bottom = 1
 let sundir = new Vector3(0, 10000, 0);
 const lat = Math.PI / 180 * (-4.74);
 const marstilt = Math.PI / 180 * (-25);
-const season = Math.random() * 2 * Math.PI;
+let season = Math.random() * 2 * Math.PI;
 scene.add(directionalLight)
 // debugObject.directionalLightColor = 0xBEB4A2
 // gui
@@ -232,43 +259,43 @@ scene.add(directionalLight)
 
 // spot light for night
 
-let spotLight = new THREE.SpotLight( 0xffffff, 4 );
+// let spotLight = new THREE.SpotLight( 0xffffff, 4 );
 
-spotLight.position.set( -4113.061301220854,  -2146.0129895888986 + 160, -9298.842704613437);
-spotLight.angle = Math.PI / 12 * 0;
-spotLight.penumbra = 0.1;
-spotLight.decay = 1.;
+// spotLight.position.set( -4113.061301220854,  -2146.0129895888986 + 160, -9298.842704613437);
+// spotLight.angle = Math.PI / 12 * 0;
+// spotLight.penumbra = 0.1;
+// spotLight.decay = 1.;
 
-spotLight.target.position.set( pos2d.x , -2140.45183981286 +120 , pos2d.y)
-spotLight.target.updateMatrixWorld();
+// spotLight.target.position.set( pos2d.x , -2140.45183981286 +120 , pos2d.y)
+// spotLight.target.updateMatrixWorld();
 
-spotLight.castShadow = true;
-spotLight.shadow.mapSize.width = 2048;
-spotLight.shadow.mapSize.height = 2048;
-spotLight.shadow.camera.near = 200;
-spotLight.shadow.camera.far = 1500;
-spotLight.shadow.focus = 1;
+// spotLight.castShadow = true;
+// spotLight.shadow.mapSize.width = 2048;
+// spotLight.shadow.mapSize.height = 2048;
+// spotLight.shadow.camera.near = 200;
+// spotLight.shadow.camera.far = 1500;
+// spotLight.shadow.focus = 1;
 
-scene.add( spotLight );
+// scene.add( spotLight );
 
-debugObject.spotLightOnOff = false;
-gui
-    .add(debugObject, 'spotLightOnOff')
-    .onChange(()=>
-    {
-        spotLight.angle = Math.PI / 12 * debugObject.spotLightOnOff;
-    })
-    .name("spot light switch");
-debugObject.spotLightColor = 0xffffff
-gui
-    .addColor(debugObject, 'spotLightColor')
-    .onChange(()=>
-    {
-        spotLight.color.set(debugObject.spotLightColor)
-    })
-    .name('spot light color')
+// debugObject.spotLightOnOff = false;
+// gui
+//     .add(debugObject, 'spotLightOnOff')
+//     .onChange(()=>
+//     {
+//         spotLight.angle = Math.PI / 12 * debugObject.spotLightOnOff;
+//     })
+//     .name("spot light switch");
+// debugObject.spotLightColor = 0xffffff
+// gui
+//     .addColor(debugObject, 'spotLightColor')
+//     .onChange(()=>
+//     {
+//         spotLight.color.set(debugObject.spotLightColor)
+//     })
+//     .name('spot light color')
 
-gui.add(spotLight, 'intensity').min(0).max(8).step(0.01).name('spot light intensity')
+// gui.add(spotLight, 'intensity').min(0).max(8).step(0.01).name('spot light intensity')
 
 
 // spot light for target
@@ -288,21 +315,40 @@ spotLight2.shadow.focus = 1;
 scene.add( spotLight2 );
 
 // head light for kapi
-// let spotLight3 = new THREE.SpotLight( 0xffffff, 6 );
-// spotLight3.angle = Math.PI / 12;
-// spotLight3.penumbra = 0.1;
-// spotLight3.decay = 0.1;
-
-// spotLight3.castShadow = true;
-// spotLight3.shadow.mapSize.width = 512;
-// spotLight3.shadow.mapSize.height = 512;
-// spotLight3.shadow.camera.near = 10;
-// spotLight3.shadow.camera.far = 200;
-// spotLight3.shadow.focus = 1;
-
-// scene.add( spotLight3 );
+let spotLight3 = new THREE.SpotLight( 0xffffff, 3 );
+spotLight3.angle = Math.PI / 12;
+spotLight3.penumbra = 0.1;
+spotLight3.distance = 20000;
+spotLight3.decay = 2;
 
 
+spotLight3.castShadow = true;
+spotLight3.shadow.mapSize.width = 512;
+spotLight3.shadow.mapSize.height = 512;
+spotLight3.shadow.camera.near = 10;
+spotLight3.shadow.camera.far = 200;
+spotLight3.shadow.focus = 1;
+
+scene.add( spotLight3 );
+
+debugObject.headLightOn = true;
+debugObject.superdistance = false;
+gui
+    .add(debugObject, 'headLightOn')
+    .onChange(()=>
+    {
+        spotLight3.intensity = 3 * ( 1 + debugObject.superdistance) * debugObject.headLightOn;
+    })
+    .name("head light switch");
+gui
+    .add(debugObject, 'superdistance')
+    .onChange(()=>
+    {
+        spotLight3.intensity = 3 * ( 1 + debugObject.superdistance) * debugObject.headLightOn;
+        spotLight3.distance = ( debugObject.superdistance ? false : 20000);
+    })
+    .name("superdistance head light");
+    
 /**
  * Sizes
  */
@@ -337,8 +383,15 @@ window.addEventListener('mousemove', (_event)=>
 })
 
 let mouseOnClick = false
-window.addEventListener('click', ()=>
+window.addEventListener('dblclick', ()=>
 {
+    mouseOnClick = true
+})
+
+window.addEventListener('touchend', (_event)=>
+{
+    mouse.x = _event.clientX / sizes.width * 2 - 1
+    mouse.y = - (_event.clientY / sizes.height ) * 2 + 1
     mouseOnClick = true
 })
 
@@ -390,19 +443,22 @@ const controls = new OrbitControls( camera, renderer.domElement)
 // 	RIGHT: THREE.MOUSE.PAN,
 // }
 // controls.target = beaconMesh.position;
-controls.minDistance = 30;
-controls.maxDistance = 60;
-controls.maxPolarAngle = Math.PI///1.7 // / 2.5;
+controls.minDistance = 8;
+controls.maxDistance = 50;
+let beaconCamDistance = 50;
+controls.maxPolarAngle = Math.PI/2///1.7 // / 2.5;
 controls.mouseButtons = {
-	LEFT: null,
+	LEFT: THREE.MOUSE.ROTATE,
 	MIDDLE: THREE.MOUSE.DOLLY,
-	RIGHT: THREE.MOUSE.ROTATE,
+	RIGHT: THREE.MOUSE.DOLLY_PAN,
 }
 controls.touches = {
-	ONE: null,
-	TWO: THREE.TOUCH.ROTATE,//THREE.TOUCH.DOLLY_PAN
+	ONE: THREE.MOUSE.ROTATE,
+	TWO: THREE.TOUCH.DOLLY,//THREE.TOUCH.DOLLY_PAN
 }
 controls.target.copy( beaconMesh.position );
+controls.update();
+controls.maxDistance = 70;
 
 /**
  * Background & Fog Colors debug GUI
@@ -450,6 +506,18 @@ let previousTime = 0
 let vel= new Vector2(0,0);
 let target2d = new Vector2(0,0);
 let kapiOnRun = -1;
+const marsdayDOM = document.getElementById('marsday');
+
+let marsDays = 0;
+const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
+
+debugObject.sunSpeed = 100.;
+gui
+    .add(debugObject, 'sunSpeed')
+    .min(0)
+    .max(1000)
+    .step(0.1)
+    .name('sun speed')
 
 const tick = () =>
 {
@@ -458,6 +526,15 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
+    const marsDayInSec = 24*3600 + 37*60;
+    marsDays += deltaTime * debugObject.sunSpeed /marsDayInSec
+    const days = Math.floor(marsDays + 0.5);
+    const hours = Math.floor( (marsDays + 0.5 - days) * marsDayInSec / 3600 );
+    const minutes = Math.floor((marsDays + 0.5 - days) * marsDayInSec / 60 - hours * 60);
+    const seconds = Math.floor((marsDays + 0.5 - days) * marsDayInSec % 60);
+    if(marsdayDOM){
+        marsdayDOM.innerText = `${days} days ${hours} hours ${minutes} minutes ${seconds} seconds`;
+    }
 
     // Update controls
     controls.update()
@@ -465,19 +542,43 @@ const tick = () =>
     // Cast a ray
     if (galecraterloaded){
 
+        // update beacon
+        const beaconCamDiff = beaconMesh.position.distanceTo(camera.position) - beaconCamDistance;
+        beaconMesh.position.y += beaconCamDiff*0.13;
+        camera.position.y += beaconCamDiff*0.13;
+        beaconHeight += beaconCamDiff*0.13;
+        beaconCamDistance += beaconCamDiff;
+        controls.maxPolarAngle = Math.PI/2 + 2.3 * (1 / beaconHeight - 0.2 );
+        
+        // beaconMesh.position.y += capibaraScene.position.distanceTo(camera.position) /2;
+
         // Simulate sun movement and light color
         sundir = new THREE.Vector3(0,1,0);
-        sundir.applyAxisAngle( new Vector3(0,0,1), season );
+        sundir.applyAxisAngle( new Vector3(0,0,1), marsDays/marsYearInmarsDay * Math.PI * 2);
         sundir.applyAxisAngle( new Vector3(1,0,0), - marstilt );
-        sundir.applyAxisAngle( new Vector3(0,0,1), (elapsedTime)/24*Math.PI );
+        sundir.applyAxisAngle( new Vector3(0,0,1), (marsDays)*2*Math.PI );
         sundir.applyAxisAngle( new Vector3(1,0,0), - lat );
         directionalLight.position.copy(sundir);
         const sunind = sundir.dot(new Vector3(0,1,0));
         sunMesh.position.copy(sundir.multiplyScalar(sunDistance));
-        directionalLight.intensity = 0.5 / (1 + Math.exp( -2 * sunind));
-        hemisphereLight.intensity = 0.15 * Math.max(sunind , 0) + 0.12;
-        renderer.setClearColor(Color.hsl(216, 12, 6 + 65 * Math.max( sunind , 0)**2 ).hex())
-        scene.fog.color.set(Color.hsl(216, 12, 6 + 65 * Math.max( sunind , 0)**2 ).hex())        
+        directionalLight.intensity = ( sunind > 0.2 ? 0.6 : (sunind < -0.2 ? 0 : 0.3+ 0.6/0.4 * sunind));
+        //hemisphereLight.intensity = 0* 0.15 / (1 + Math.exp( -120 * (sunind + 0.5))) + 0.12;
+        const suhem = [ 0.82 , 0.3, 0.];
+        const suran = [ 0.08 * 2 , -0.152 ];
+        
+        let sunint = ( sunind > suran[0] ? suhem[0] :
+            ( sunind < suran[1] ? suhem[2] :
+                ( sunind > 0 ? suhem[1] - (suhem[1]-suhem[0])*sunind/suran[0] :
+                suhem[1] - (suhem[1]-suhem[2])*sunind/suran[1] ) ));
+        hemisphereLight.intensity = sunint;
+        sunint = (sunint - suhem[2])/(suhem[0]-suhem[2]) * 78 + 1;
+        
+        const hemicolor = Color.hsl(216, ( sunind > suran[0]*2 ? 12 : 
+            ( sunind < suran[1]*2 ? 48 : 
+                (12-48)*(0.5*sunind-suran[1])/(suran[0]-suran[1]) + 48 ) ) ,sunint).hex()
+        renderer.setClearColor(hemicolor)
+        scene.fog.color.set(hemicolor)
+        hemisphereLight.color.set(hemicolor);        
 
         if(kapiOnRun<0){
             raycaster.set(new THREE.Vector3(pos2d.x, maxHeight ,pos2d.y), new THREE.Vector3(0,-1,0))
@@ -533,21 +634,26 @@ const tick = () =>
             
             if( pos2d.dot(vel) < target2d.dot(vel) && intersect_vertical && intersect_vertical.length != 0){
                 
+                // kapi walking animation
+                if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
+                    vel.multiplyScalar(0.017);
+                    kapiOnRun = 1;
+                    spotLight2.intensity = .3;
+                    action.stop()
+                    action = mixer.clipAction(capybaraAnimation[4])
+                    action.play()
+
+                    spotLight3.position.copy(beaconMesh.position)
+                    spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
+                    spotLight3.target.updateMatrixWorld();
+                }
+
                 const pos3d = intersect_vertical[0].point;
                 
                 camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
                 capibaraScene.position.copy(pos3d);
                 beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
                 
-                // kapi walking animation
-                if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 15){
-                    vel.multiplyScalar(0.2);
-                    kapiOnRun = 1;
-                    spotLight2.intensity = .3;
-                    action.stop()
-                    action = mixer.clipAction(capybaraAnimation[4])
-                    action.play()
-                }
             }
             else {
                 action.stop()
@@ -555,10 +661,6 @@ const tick = () =>
                 action.play()
                 kapiOnRun = 0;
                 spotLight2.intensity = 0;
-
-                //spotLight3.position.copy(beaconMesh.position)
-                //spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
-                //spotLight3.target.updateMatrixWorld();
             }
         }
     }

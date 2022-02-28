@@ -3,17 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .gui_container {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        a:hover {
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* responsive class */
+        @media only screen and (max-width: 800px) {
+            .gui_container {
+                flex-direction: column;
+                margin: 40px 10px;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet">
+
     <title> Aeolis City(Gale Crater) </title>
 </head>
 <body>
     <canvas class="webgl"></canvas>
-    <div style="display:flex;flex-direction:column;position: absolute;top:0; left:80px; margin : 5px; padding:10px 20px; background: #fbfbfb80; border-radius: 10px; font-family: monospace;">
-        <span> Map center coordinates : lon , lat = 137.4° , -4.74° </span>
-        <span> Beacon size : 1m </span>
-        <span> Max speed : 60m/s ( 216 km/h )</span>
-        <span> Mouse left : to set a moving target</span>
-        <span> Mouse right : to pan the view</span>
-        <span> Headlight on on the arrival to the target</span>
+    <div id="gui_container" class="gui_container">
+        <div style="display:flex;flex-direction:column; z-index:1 ;margin : 5px; padding:10px 20px; background: #fbfbfb80; border-radius: 10px; font-family: monospace;">
+            <div style="display: flex;justify-content: space-between; margin-right:-5px; margin-bottom: 5px;">
+                <span style="font-weight: bold;"> Gale Crater</span>
+                <a onclick="document.getElementById('gui_container').remove();"><span class="material-icons" style="font-size:14px">cancel</span></a>
+            </div>
+            <div style = "display: flex;"> <div id ="marsday"></div> </div>
+            <span> Map center coordinates : lon , lat = 137.4° , -4.74° </span>
+            <span> Beacon size : 1m </span>
+            <span> Max speed : 60m/s ( 216 km/h )</span>
+            <span> Drag to pan the view</span>
+            <span> Double click(or touch) to set a destination</span>
+            <span> Headlight on on the arrival to the destination</span>
+        </div>
+        <div id="gui-div">
+            
+        </div>
     </div>
 </body>
 </html>
