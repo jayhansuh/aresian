@@ -148,10 +148,34 @@ gltfLoader.load(
 )
 
 /**
+ * Kapi House Model
+ */
+let kapiHouseScene;
+
+gltfLoader.load(
+    '/architect/soilhouse1.glb',
+    (gltf) =>
+    {
+        kapiHouseScene = gltf.scene
+         
+        kapiHouseScene.scale.set(.3, .3, .3)
+        kapiHouseScene.position.set(pos2d.x, -2118.8256403156556 -1, pos2d.y -10)
+        kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+        kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
+        // for(let i =0 ; i< kapiHouseScene.children.length ; i++){   
+        //     kapiHouseScene.children[i].position.set(pos2d.x - 100 *i , -2118.8256403156556 +10, pos2d.y);
+        //     console.log(kapiHouseScene.children[i])
+        //     scene.add(kapiHouseScene.children[i])
+        // }
+        scene.add(kapiHouseScene)
+    }
+)
+
+/**
  * Beacon
  */
 
-const beaconHeight = 12;
+let beaconHeight = 8;
 
 const beaconMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 const beaconGeometry = new THREE.SphereGeometry(0.5, 4, 2)
@@ -419,9 +443,10 @@ const controls = new OrbitControls( camera, renderer.domElement)
 // 	RIGHT: THREE.MOUSE.PAN,
 // }
 // controls.target = beaconMesh.position;
-controls.minDistance = 30;
-controls.maxDistance = 60;
-controls.maxPolarAngle = Math.PI///1.7 // / 2.5;
+controls.minDistance = 8;
+controls.maxDistance = 50;
+let beaconCamDistance = 50;
+controls.maxPolarAngle = Math.PI/2///1.7 // / 2.5;
 controls.mouseButtons = {
 	LEFT: THREE.MOUSE.ROTATE,
 	MIDDLE: THREE.MOUSE.DOLLY,
@@ -432,6 +457,8 @@ controls.touches = {
 	TWO: THREE.TOUCH.DOLLY,//THREE.TOUCH.DOLLY_PAN
 }
 controls.target.copy( beaconMesh.position );
+controls.update();
+controls.maxDistance = 70;
 
 /**
  * Background & Fog Colors debug GUI
@@ -515,6 +542,16 @@ const tick = () =>
     // Cast a ray
     if (galecraterloaded){
 
+        // update beacon
+        const beaconCamDiff = beaconMesh.position.distanceTo(camera.position) - beaconCamDistance;
+        beaconMesh.position.y += beaconCamDiff*0.13;
+        camera.position.y += beaconCamDiff*0.13;
+        beaconHeight += beaconCamDiff*0.13;
+        beaconCamDistance += beaconCamDiff;
+        controls.maxPolarAngle = Math.PI/2 + 2.3 * (1 / beaconHeight - 0.2 );
+        
+        // beaconMesh.position.y += capibaraScene.position.distanceTo(camera.position) /2;
+
         // Simulate sun movement and light color
         sundir = new THREE.Vector3(0,1,0);
         sundir.applyAxisAngle( new Vector3(0,0,1), marsDays/marsYearInmarsDay * Math.PI * 2);
@@ -597,14 +634,8 @@ const tick = () =>
             
             if( pos2d.dot(vel) < target2d.dot(vel) && intersect_vertical && intersect_vertical.length != 0){
                 
-                const pos3d = intersect_vertical[0].point;
-                
-                camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
-                capibaraScene.position.copy(pos3d);
-                beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
-                
                 // kapi walking animation
-                if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 3){
+                if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
                     vel.multiplyScalar(0.017);
                     kapiOnRun = 1;
                     spotLight2.intensity = .3;
@@ -616,6 +647,13 @@ const tick = () =>
                     spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
                     spotLight3.target.updateMatrixWorld();
                 }
+
+                const pos3d = intersect_vertical[0].point;
+                
+                camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
+                capibaraScene.position.copy(pos3d);
+                beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
+                
             }
             else {
                 action.stop()
