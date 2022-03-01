@@ -88,7 +88,6 @@ const scale = 1807
     {
         gltf.scene.scale.set(scale, scale, scale)
         gltf.scene.children[0].material = surfaceMaterial
-        galecraterloaded = true
         galecrater = gltf.scene.children[0]
         galecrater.scale.set(scale, scale, scale)
         gltf.castShadow = true
@@ -96,25 +95,36 @@ const scale = 1807
         console.log(gltf.scene.children[0])
 
         scene.add(gltf.scene.children[0])
+
+        galecraterloaded = true
     }
 )
+// small map range
+//SE end Vector3 {x:5285.414646397998, y: 4420.744278151819, z: 8126.512183287417 }
+//NW end Vector3 {x: -5669.290726929358, y: -2076.9463558085786, z: -13023.937859721813}
+//const smallMapCenter = new THREE.Vector2((5285.414646397998-5669.290726929358)/2, (8126.512183287417+-13023.937859721813)/2);
+
 
 //let galecraterSurrounding = new THREE.Group()
+let galecraterSurrounding ;
+let galecraterSurroundingloaded = false
+
 gltfLoader.load(
     '/models/galecrater_whole.glb',
     //'/models/marsGale_small.glb',
     (gltf) =>
     {
+        galecraterSurrounding = gltf.scene.children[0]
         gltf.scene.scale.set(scale, scale, scale)
         gltf.scene.children[0].material = surfaceMaterial
-        galecraterloaded = true
         gltf.scene.children[0].scale.set(scale, scale, scale)
-        gltf.scene.children[0].position.set(10010, -5490-200, 71325)
+        gltf.scene.children[0].position.set(10010, -5486-140, 71324)
         gltf.castShadow = true
         gltf.receiveShadow = true
         console.log(gltf.scene.children[0])
 
         scene.add(gltf.scene.children[0])
+        galecraterSurroundingloaded=true;
     }
 )
 
@@ -458,7 +468,7 @@ controls.touches = {
 }
 controls.target.copy( beaconMesh.position );
 controls.update();
-controls.maxDistance = 70;
+controls.maxDistance = 120;
 
 /**
  * Background & Fog Colors debug GUI
@@ -511,7 +521,7 @@ const marsdayDOM = document.getElementById('marsday');
 let marsDays = 0;
 const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
 
-debugObject.sunSpeed = 100.;
+debugObject.sunSpeed = 300.;
 gui
     .add(debugObject, 'sunSpeed')
     .min(0)
@@ -549,8 +559,12 @@ const tick = () =>
         beaconHeight += beaconCamDiff*0.13;
         beaconCamDistance += beaconCamDiff;
         controls.maxPolarAngle = Math.PI/2 + 2.3 * (1 / beaconHeight - 0.2 );
-        
         // beaconMesh.position.y += capibaraScene.position.distanceTo(camera.position) /2;
+        
+        // Debug mode
+        //controls.maxPolarAngle = Math.PI;
+        //controls.maxDistance = 100000;
+        
 
         // Simulate sun movement and light color
         sundir = new THREE.Vector3(0,1,0);
@@ -594,13 +608,16 @@ const tick = () =>
         }
 
         raycaster.setFromCamera(mouse, camera)
-        const intersect = raycaster.intersectObject(galecrater)
+        let intersect = raycaster.intersectObject(galecrater)
+        if(galecraterSurroundingloaded && (!(intersect) || intersect.length == 0)){
+            intersect = raycaster.intersectObject(galecraterSurrounding)
+        }
 
         if (mouseOnClick && intersect.length != 0)
         {
             const collidingSurface = intersect[0].point
             target2d = new THREE.Vector2(collidingSurface.x, collidingSurface.z );
-            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(60);//216 km/h
+            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40);//144 km/h
             
             // rotate the object to orient it to the target2d
             const phi = Math.atan2(vel.y, vel.x);
@@ -609,7 +626,10 @@ const tick = () =>
             }
             
             raycaster.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
-            const intersect_vertical = raycaster.intersectObject(galecrater)
+            let intersect_vertical = raycaster.intersectObject(galecrater)
+            if(galecraterSurroundingloaded && (!(intersect_vertical) || intersect_vertical.length == 0)){
+                intersect_vertical = raycaster.intersectObject(galecraterSurrounding)
+            }
             if( intersect_vertical && intersect_vertical.length != 0){
                 console.log(intersect_vertical[0].point)
                 spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
@@ -630,13 +650,15 @@ const tick = () =>
 
             pos2d.addScaledVector(vel, deltaTime);
             raycaster.set(new THREE.Vector3(pos2d.x, maxHeight , pos2d.y), new THREE.Vector3(0,-1,0))
-            const intersect_vertical = raycaster.intersectObject(galecrater)
-            
+            let intersect_vertical = raycaster.intersectObject(galecrater)
+            if(galecraterSurroundingloaded && (!(intersect_vertical) || intersect_vertical.length == 0)){
+                intersect_vertical = raycaster.intersectObject(galecraterSurrounding)
+            }
             if( pos2d.dot(vel) < target2d.dot(vel) && intersect_vertical && intersect_vertical.length != 0){
                 
                 // kapi walking animation
                 if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
-                    vel.multiplyScalar(0.017);
+                    vel.multiplyScalar(0.028);
                     kapiOnRun = 1;
                     spotLight2.intensity = .3;
                     action.stop()
