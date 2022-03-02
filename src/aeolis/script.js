@@ -182,6 +182,33 @@ gltfLoader.load(
 )
 
 /**
+ * Kapi Neighbor
+ */
+let mixer2 = null
+let action2
+let capybaraAnimation2
+let capibaraScene2
+
+ gltfLoader.load(
+    '/models/capybara.glb',
+    (gltf) =>
+    { 
+        capibaraScene2 = gltf.scene
+        capybaraAnimation2 = gltf.animations
+         
+        capibaraScene2.scale.set(.2, .2, .2)
+        capibaraScene2.position.set(pos2d.x+5, -2118.8256403156556 +0.2, pos2d.y)
+        capibaraScene2.rotation.y = - Math.PI / 2
+        scene.add(capibaraScene2)
+ 
+        // Animation
+        mixer2 = new THREE.AnimationMixer(capibaraScene2)
+        action2 = mixer2.clipAction(capybaraAnimation2[2])
+        action2.play()
+    }
+)
+
+/**
  * Beacon
  */
 
@@ -213,9 +240,9 @@ const ambientlight = new THREE.AmbientLight(0xffffff, 100);
 ambientlight.layers.set(1);
 scene.add(ambientlight);
 
-debugObject.sunAngularRadius = 0.1765 * 2;
+debugObject.sunAngularSize = 0.1765 * 2;
 gui
-    .add(debugObject, 'sunAngularRadius')
+    .add(debugObject, 'sunAngularSize')
     .min(0)
     .max(30)
     .step(0.01)
@@ -224,7 +251,7 @@ gui
         const multiplier = Math.tan(debugObject.sunAngularRadius * Math.PI / 180 )/ Math.tan(0.1765 * 2 * Math.PI / 180 );
         sunMesh.scale.set(multiplier,multiplier,multiplier);
     })
-    .name("sun angular radius(deg)");
+    .name("sun angular size(deg)");
 
 /**
  * Lights
@@ -585,7 +612,7 @@ const tick = () =>
                 ( sunind > 0 ? suhem[1] - (suhem[1]-suhem[0])*sunind/suran[0] :
                 suhem[1] - (suhem[1]-suhem[2])*sunind/suran[1] ) ));
         hemisphereLight.intensity = sunint;
-        sunint = (sunint - suhem[2])/(suhem[0]-suhem[2]) * 78 + 1;
+        sunint = (sunint - suhem[2])/(suhem[0]-suhem[2]) * 78 + 5;
         
         const hemicolor = Color.hsl(216, ( sunind > suran[0]*2 ? 12 : 
             ( sunind < suran[1]*2 ? 48 : 
@@ -697,6 +724,10 @@ const tick = () =>
     if(mixer)
     {
         mixer.update(deltaTime)
+    }
+    if(mixer2)
+    {
+        mixer2.update(deltaTime)
     }
 
     // Render
