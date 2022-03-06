@@ -66,14 +66,16 @@
 </head>
 <body>
 
-    <div id="touchDiv" style="position: absolute;width:100%;height:100%;z-index: -1;"></div>
+    <div id="touchDiv" style="position: absolute;width:100%;height:100%;z-index: -1;">a</div>
     <canvas class="webgl"></canvas>
-    
-    <div class="menubarContainer">
 
+    <div class="menubarContainer">
         <div class="menubar">
 
             <div>
+                <!-- This div prevent double click highlights-->
+                <div style="margin-top: -10px;height:10px;opacity:0;">a</div>
+
                 <button onclick="window.location='/'" style="
                     font-family: EastSeaDokdo;
                     font-size: 38px;">

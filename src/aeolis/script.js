@@ -31,12 +31,25 @@ function drawMiniMap(pos){
         minimap_ctx.clearRect(0,0,canvas.width,canvas.height);
         minimap_ctx.drawImage(minimap_img,0,0,minimap_width,minimap_height);
         minimap_ctx.beginPath();
-        minimap_ctx.arc(x, y, 3, 0, 2 * Math.PI, false);
+        minimap_ctx.arc(x, y, 4, 0, 2 * Math.PI, false);
         minimap_ctx.fillStyle = 'Salmon';
         minimap_ctx.fill();
         minimap_ctx.strokewidth=8;
         minimap_ctx.strokeStyle = 'OrangeRed';
         minimap_ctx.stroke();
+
+        //Draw direction arrow
+        const dir = (new Vector2(pos.x - camera.position.x, pos.y - camera.position.z)).normalize().multiplyScalar(10);
+        minimap_ctx.beginPath();
+        minimap_ctx.moveTo(x + 0.7 * dir.x - 0.3 * dir.y , y + 0.7* dir.y + 0.3 * dir.x);
+        minimap_ctx.lineTo(x + 1.3 * dir.x , y + 1.3 * dir.y);
+        minimap_ctx.lineTo(x + 0.7 * dir.x + 0.3 * dir.y , y + 0.7 * dir.y - 0.3 * dir.x);
+        minimap_ctx.lineTo(x + 0.7 * dir.x - 0.3 * dir.y , y + 0.7* dir.y + 0.3 * dir.x);
+        minimap_ctx.fillStyle = 'Salmon';
+        minimap_ctx.fill();
+        minimap_ctx.strokeStyle = 'OrangeRed';
+        minimap_ctx.stroke();
+
     }
 }
 
@@ -75,6 +88,12 @@ const dracoLoader = new DRACOLoader()
 dracoLoader.setDecoderPath('/draco/')
 const gltfLoader = new GLTFLoader()
 gltfLoader.setDRACOLoader(dracoLoader)
+const terrGroup = new THREE.Group()
+scene.add(terrGroup)
+const unitGroup = new THREE.Group()
+scene.add(unitGroup)
+const wallGroup = new THREE.Group()
+scene.add(wallGroup)
 
 /** 
  * Surface Material
@@ -113,7 +132,7 @@ const scale = 1807
         gltf.receiveShadow = true
         console.log(gltf.scene.children[0])
 
-        scene.add(gltf.scene.children[0])
+        terrGroup.add(gltf.scene.children[0])
 
         galecraterloaded = true
     }
@@ -141,7 +160,7 @@ gltfLoader.load(
         gltf.receiveShadow = true
         console.log(gltf.scene.children[0])
 
-        scene.add(gltf.scene.children[0])
+        terrGroup.add(gltf.scene.children[0])
         galecraterSurroundingloaded=true;
     }
 )
@@ -190,7 +209,11 @@ gltfLoader.load(
         kapiHouseScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3, pos2d.y -10)
         kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
         kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
-        scene.add(kapiHouseScene)
+
+        kapiHouseScene.castShadow = true
+        kapiHouseScene.receiveShadow = true
+
+        wallGroup.add(kapiHouseScene)
     }
 )
 
@@ -340,8 +363,9 @@ window.addEventListener('mousemove', (_event)=>
 })
 
 let mouseOnClick = false
-window.addEventListener('dblclick', ()=>
+window.addEventListener('dblclick', (event)=>
 {
+    //event.preventDefault()
     mouseOnClick = true
 })
 
@@ -417,7 +441,19 @@ scene.fog = new THREE.Fog(backgroundColor.hex() , near , far );
  * Raycaster
  */
 const raycaster = new THREE.Raycaster()
-
+// raycaster.params.Points.threshold = 0.1
+// raycaster.params.Line.threshold = 0.1
+// raycaster.params.Mesh.threshold = 0.1
+// ground setting
+const groundObjs = [galecrater,galecraterSurrounding];
+function getIntersect(){
+    raycaster.setFromCamera(mouse, camera);
+    let intersects = raycaster.intersectObjects(groundObjs);
+    if (intersects.length > 0) {
+        return intersects[0]
+    }
+    return null
+}
 
 /**
  * Animate
@@ -496,7 +532,7 @@ const tick = () =>
         scene.fog.color.set(hemicolor)
         hemisphereLight.color.set(hemicolor);        
 
-        if(kapiOnRun<0){
+        if(kapiOnRun<0){//This is for the initial loading
             raycaster.set(new THREE.Vector3(pos2d.x, maxHeight ,pos2d.y), new THREE.Vector3(0,-1,0))
             const intersect = raycaster.intersectObject(galecrater)
             if( intersect && intersect.length != 0){
@@ -509,11 +545,8 @@ const tick = () =>
             }
         }
 
-        raycaster.setFromCamera(mouse, camera)
-        let intersect = raycaster.intersectObject(galecrater)
-        if(galecraterSurroundingloaded && (!(intersect) || intersect.length == 0)){
-            intersect = raycaster.intersectObject(galecraterSurrounding)
-        }
+        raycaster.setFromCamera(mouse, camera);
+        let intersect = raycaster.intersectObjects(terrGroup.children , true );
 
         if (mouseOnClick && intersect.length != 0)
         {
@@ -528,10 +561,7 @@ const tick = () =>
             }
             
             raycaster.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
-            let intersect_vertical = raycaster.intersectObject(galecrater)
-            if(galecraterSurroundingloaded && (!(intersect_vertical) || intersect_vertical.length == 0)){
-                intersect_vertical = raycaster.intersectObject(galecraterSurrounding)
-            }
+            let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
             if( intersect_vertical && intersect_vertical.length != 0){
                 console.log(intersect_vertical[0].point)
                 spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
@@ -551,33 +581,54 @@ const tick = () =>
         if(kapiOnRun>0){
 
             pos2d.addScaledVector(vel, deltaTime);
+            
+            // check if kapi arrived
             raycaster.set(new THREE.Vector3(pos2d.x, maxHeight , pos2d.y), new THREE.Vector3(0,-1,0))
-            let intersect_vertical = raycaster.intersectObject(galecrater)
-            if(galecraterSurroundingloaded && (!(intersect_vertical) || intersect_vertical.length == 0)){
-                intersect_vertical = raycaster.intersectObject(galecraterSurrounding)
+            let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
+            if( pos2d.dot(vel) > target2d.dot(vel) || !intersect_vertical || intersect_vertical.length == 0){
+                kapiOnRun = 0;
             }
-            if( pos2d.dot(vel) < target2d.dot(vel) && intersect_vertical && intersect_vertical.length != 0){
-                
-                // kapi walking animation
-                if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
-                    vel.multiplyScalar(0.028);
-                    kapiOnRun = 1;
-                    spotLight2.intensity = .3;
-                    action.stop()
-                    action = mixer.clipAction(capybaraAnimation[4])
-                    action.play()
+            const pos3d = intersect_vertical[0].point;
 
-                    spotLight3.position.copy(beaconMesh.position)
-                    spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
-                    spotLight3.target.updateMatrixWorld();
-                }
+            // check slope
+            if(kapiOnRun>0){
+                const normal = intersect_vertical[0].face.normal.normalize();
+                const slope = Math.abs(normal.dot(new THREE.Vector3(0,1,0)));
+                if( slope < 0.5 || Math.abs(pos3d.y - capibaraScene.position.y) > 3 ){
+                    console.log("slope too steep")
+                    kapiOnRun = 0;
+                }    
+            }
 
-                const pos3d = intersect_vertical[0].point;
-                
+            // check the collision with the wallGroup
+            // if(kapiOnRun>0){
+            //     raycaster.set(capibaraScene.position, new Vector3(vel.x, 0, vel.y));
+            //     const intersect_view = raycaster.intersectObjects(terrGroup, true );
+            //     console.log(intersect_view)
+            //     if( intersect_view && intersect_view.length != 0 && intersect_view[0].distance < 1000){
+            //         console.log("collision with wall")
+            //         kapiOnRun = 0;
+            //     }
+            // }
+
+            // kapi walking animation
+            if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
+                vel.multiplyScalar(0.07);
+                kapiOnRun = 1;
+                spotLight2.intensity = .3;
+                action.stop()
+                action = mixer.clipAction(capybaraAnimation[4])
+                action.play()
+
+                spotLight3.position.copy(beaconMesh.position)
+                spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
+                spotLight3.target.updateMatrixWorld();
+            }
+
+            if( kapiOnRun > 0){
                 camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
                 capibaraScene.position.copy(pos3d);
                 beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
-                
             }
             else {
                 action.stop()
