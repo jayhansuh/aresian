@@ -638,6 +638,8 @@ const tick = () =>
         controls.maxPolarAngle = Math.PI/2 + 2.4 * (1 / ((beaconHeight-8)*1.3+8)  - 0.2 );
         //console.log(capibaraScene.position.y - camera.position.y)
         
+        
+
         // Debug mode
         // controls.minPolarAngle = 0;
         // controls.maxPolarAngle = Math.PI;
@@ -684,41 +686,49 @@ const tick = () =>
             }
         }
 
-        raycaster_far.setFromCamera(mouse, camera);
-        let intersect = raycaster_far.intersectObjects(terrGroup.children , true );
-
-        if (mouseOnClick && intersect.length != 0)
+        
+        if (mouseOnClick)
         {
-            const collidingSurface = intersect[0].point
-            target2d = new THREE.Vector2(collidingSurface.x, collidingSurface.z );
-            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40);//144 km/h
-            
-            // rotate the object to orient it to the target2d
-            const phi = Math.atan2(vel.y, vel.x);
-            if(phi){
-                capibaraScene.rotation.y = Math.PI/2- phi;
-            }
-            
-            raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
-            let intersect_vertical = raycaster_far.intersectObjects(terrGroup.children , true );
-            if( intersect_vertical && intersect_vertical.length != 0){
-                console.log(intersect_vertical[0].point)
-                spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
-                spotLight2.target.position.copy(intersect_vertical[0].point)
-                spotLight2.intensity = 2.;
-                spotLight2.target.updateMatrixWorld();
+            raycaster_far.setFromCamera(mouse, camera);
+            let intersect = raycaster_far.intersectObjects(terrGroup.children , true );
+            if(intersect && intersect.length > 0){
+                const collidingSurface = intersect[0].point
+                target2d = new THREE.Vector2(collidingSurface.x, collidingSurface.z );
+                vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40);//144 km/h
                 
-                // kapi running animation
-                console.log('kapiOnRun', kapiOnRun)
-                action.stop()
-                action = mixer.clipAction(capybaraAnimation[3])
-                action.play()
-                kapiOnRun = 2;
+                // rotate the object to orient it to the target2d
+                const phi = Math.atan2(vel.y, vel.x);
+                if(phi){
+                    capibaraScene.rotation.y = Math.PI/2- phi;
+                }
+                
+                raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
+                let intersect_vertical = raycaster_far.intersectObjects(terrGroup.children , true );
+                if( intersect_vertical && intersect_vertical.length != 0){
+                    console.log(intersect_vertical[0].point)
+                    spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
+                    spotLight2.target.position.copy(intersect_vertical[0].point)
+                    spotLight2.intensity = 2.;
+                    spotLight2.target.updateMatrixWorld();
+                    
+                    // kapi running animation
+                    console.log('kapiOnRun', kapiOnRun)
+                    action.stop()
+                    action = mixer.clipAction(capybaraAnimation[3])
+                    action.play()
+                    kapiOnRun = 2;
+                }
             }
         }
         mouseOnClick = false;
 
         if(kapiOnRun>0){
+
+            // kapiOnRun
+            // -1: abort running
+            // 0: standing
+            // 1: walking to target
+            // 2: running to target
 
             pos2d.addScaledVector(vel, deltaTime);
             
@@ -733,16 +743,18 @@ const tick = () =>
                 kapiOnRun = -1;
                 console.log('kapi can not reach target')
             }
-            let pos3d;
-
+            
             // check slope
+            let pos3d;
+            let isStairs;
             if(kapiOnRun>0){
                 pos3d = intersect_vertical[0].point;
+                isStairs = (intersect_vertical[0].object.name.slice(0,6)=="stairs");
                 //const normal = intersect_vertical[0].face.normal.normalize();
                 //const slope = Math.abs(normal.dot(new THREE.Vector3(0,1,0)));
                 //console.log(Math.acos(slope)*180/Math.PI)
                 //if( slope < 0.8 || Math.abs(pos3d.y - capibaraScene.position.y) > jmpthr){
-                if( Math.abs((pos3d.y - capibaraScene.position.y)/(vel.length()*deltaTime)) > jmpthr){
+                if( !isStairs && Math.abs((pos3d.y - capibaraScene.position.y)/(vel.length()*deltaTime)) > jmpthr){
                     console.log("slope too steep")
                     //console.log(slope)
                     kapiOnRun = -1;
@@ -750,7 +762,7 @@ const tick = () =>
             }
 
             // check the collision with the wallGroup
-            if(kapiOnRun>0){
+            if( !isStairs && kapiOnRun>0){
                 const normvel = (new Vector3(vel.x,0,vel.y)).normalize().multiplyScalar(jmpthr/10);
                 const feetpos = (new Vector3(0,jmpthr/2,0)).add(capibaraScene.position);
                 raycaster.set(feetpos,normvel);
