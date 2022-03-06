@@ -1,11 +1,11 @@
 import '../style.css'
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
+//import { PointerLockControls } from 'three/examples/jsm/controls/PointerLockControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import * as dat from 'lil-gui'
-import Stats from 'stats.js'
+//import * as dat from 'lil-gui'
+//import Stats from 'stats.js'
 import { Sphere, TextureLoader, Vector2, Vector3 } from 'three';
 const Color = require('color');
 
@@ -15,25 +15,81 @@ const Color = require('color');
 //import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 
 /**
+ * Minimap & Menubar buttons
+ */
+
+const minimap=document.getElementById('minimap');
+const minimap_ctx=minimap.getContext('2d');
+const minimap_width=minimap.width;
+const minimap_height=minimap.height;
+let minimapOnOff = null;
+
+const minimap_img = new Image();
+minimap_img.src = "/imgs/gale_minimap.jpeg";
+minimap_img.onload = function(){
+    minimapOnOff=false;
+}
+
+function drawMiniMap(pos){
+    if(minimapOnOff){
+        const scale = 1/1807/100;
+        const x = ((pos.x - 24338.93445296312)*scale + 0.5)*minimap_width;
+        const y = ((pos.y - 32736.594012823894)*scale + 0.5)*minimap_height;
+        
+        minimap_ctx.clearRect(0,0,canvas.width,canvas.height);
+        minimap_ctx.drawImage(minimap_img,0,0,minimap_width,minimap_height);
+        minimap_ctx.beginPath();
+        minimap_ctx.arc(x, y, 3, 0, 2 * Math.PI, false);
+        minimap_ctx.fillStyle = 'Salmon';
+        minimap_ctx.fill();
+        minimap_ctx.strokewidth=8;
+        minimap_ctx.strokeStyle = 'OrangeRed';
+        minimap_ctx.stroke();
+    }
+}
+
+function subMenuOnOff(divname){
+
+    if(divname=='minimapdiv' && minimapOnOff==null){
+        return;
+    }
+
+    const div = document.getElementById(divname);
+    if(div.style.getPropertyValue('display') === 'none'){
+        div.style.setProperty('display','flex');
+        if(divname == "minimapdiv"){
+            minimapOnOff=true;
+        }
+    }
+    else{
+        div.style.setProperty('display','none');
+        if(divname == "minimapdiv"){
+            minimapOnOff=false;
+        }
+    }
+}
+window.subMenuOnOff = subMenuOnOff;
+
+/**
  * Stats
  */
-const stats = new Stats()
-stats.showPanel(0)
-document.body.appendChild(stats.dom)
-stats.dom.style.position = 'absolute'
-stats.dom.style.left = '0px'
-stats.dom.style.top = 'calc(100% - 48px)'
+// const stats = new Stats()
+// stats.showPanel(0)
+// document.body.appendChild(stats.dom)
+// stats.dom.style.position = 'absolute'
+// stats.dom.style.left = '0px'
+// stats.dom.style.top = 'calc(100% - 48px)'
 
 /**
  * Base
  */
 // Debug
-const debugObject = {}
-const gui = new dat.GUI({
-    width: 300,
-})
-gui.close();
-gui.domElement.id = 'gui'
+// const debugObject = {}
+// const gui = new dat.GUI({
+//     width: 300,
+// })
+// gui.close();
+// gui.domElement.id = 'gui'
 
 // Canvas
 const canvas = document.querySelector('canvas.webgl')
@@ -52,15 +108,7 @@ gltfLoader.setDRACOLoader(dracoLoader)
 /** 
  * Surface Material
  */
-debugObject.surfaceColor = "rgb(158,102,76)"//"#C9C9B6"
-const surfaceMaterial = new THREE.MeshStandardMaterial({ color: debugObject.surfaceColor })
-// gui
-//     .addColor(debugObject, 'surfaceColor')
-//     .onChange(() =>
-//     {
-//         surfaceMaterial.color.set(debugObject.surfaceColor)
-//     })
-//     .name('surface color')
+const surfaceMaterial = new THREE.MeshStandardMaterial({ color: "rgb(158,102,76)" })
 
 // /**
 //  * Lod
@@ -86,10 +134,10 @@ const scale = 1807
     '/models/marsGale_small.glb',
     (gltf) =>
     {
-        gltf.scene.scale.set(scale, scale, scale)
+        gltf.scene.scale.set(scale, scale/3, scale)
         gltf.scene.children[0].material = surfaceMaterial
         galecrater = gltf.scene.children[0]
-        galecrater.scale.set(scale, scale, scale)
+        galecrater.scale.set(scale, scale/3, scale)
         gltf.castShadow = true
         gltf.receiveShadow = true
         console.log(gltf.scene.children[0])
@@ -115,10 +163,10 @@ gltfLoader.load(
     (gltf) =>
     {
         galecraterSurrounding = gltf.scene.children[0]
-        gltf.scene.scale.set(scale, scale, scale)
+        gltf.scene.scale.set(scale, scale/3, scale)
         gltf.scene.children[0].material = surfaceMaterial
-        gltf.scene.children[0].scale.set(scale, scale, scale)
-        gltf.scene.children[0].position.set(10010, -5486-140, 71324)
+        gltf.scene.children[0].scale.set(scale, scale/3, scale)
+        gltf.scene.children[0].position.set(10010, (-5486-140)/3, 71324)
         gltf.castShadow = true
         gltf.receiveShadow = true
         console.log(gltf.scene.children[0])
@@ -147,7 +195,7 @@ gltfLoader.load(
         capybaraAnimation = gltf.animations
          
         capibaraScene.scale.set(.3, .3, .3)
-        capibaraScene.position.set(pos2d.x, -2118.8256403156556 , pos2d.y)
+        capibaraScene.position.set(pos2d.x, -2118.8256403156556/3 , pos2d.y)
         scene.add(capibaraScene)
  
         // Animation
@@ -169,7 +217,7 @@ gltfLoader.load(
         kapiHouseScene = gltf.scene
          
         kapiHouseScene.scale.set(.3, .3, .3)
-        kapiHouseScene.position.set(pos2d.x, -2118.8256403156556 -1, pos2d.y -10)
+        kapiHouseScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3, pos2d.y -10)
         kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
         kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
         // for(let i =0 ; i< kapiHouseScene.children.length ; i++){   
@@ -197,7 +245,7 @@ let capibaraScene2
         capybaraAnimation2 = gltf.animations
          
         capibaraScene2.scale.set(.2, .2, .2)
-        capibaraScene2.position.set(pos2d.x+5, -2118.8256403156556 +0.2, pos2d.y)
+        capibaraScene2.position.set(pos2d.x+5, (-2118.8256403156556 +0.2)/3, pos2d.y)
         capibaraScene2.rotation.y = - Math.PI / 2
         scene.add(capibaraScene2)
  
@@ -218,7 +266,8 @@ const beaconMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe:
 const beaconGeometry = new THREE.SphereGeometry(0.5, 4, 2)
 //const beaconGeometry = new THREE.IcosahedronGeometry(0.5, 0)
 const beaconMesh = new THREE.Mesh( beaconGeometry, beaconMaterial)
-beaconMesh.position.set(pos2d.x, -2118.8256403156556 + beaconHeight , pos2d.y)
+beaconMesh.position.set(pos2d.x, -2118.8256403156556 /3 + beaconHeight , pos2d.y)
+//beaconMesh.rotateOnAxis(new Vector3(0,1,0),Math.PI / 4)
 Sphere.castShadow = true
 beaconMesh.layers.enable(1);
 scene.add( beaconMesh )
@@ -240,18 +289,18 @@ const ambientlight = new THREE.AmbientLight(0xffffff, 100);
 ambientlight.layers.set(1);
 scene.add(ambientlight);
 
-debugObject.sunAngularSize = 0.1765 * 2;
-gui
-    .add(debugObject, 'sunAngularSize')
-    .min(0)
-    .max(30)
-    .step(0.01)
-    .onChange(()=>
-    {
-        const multiplier = Math.tan(debugObject.sunAngularRadius * Math.PI / 180 )/ Math.tan(0.1765 * 2 * Math.PI / 180 );
-        sunMesh.scale.set(multiplier,multiplier,multiplier);
-    })
-    .name("sun angular size(deg)");
+// debugObject.sunAngularSize = 0.1765 * 2;
+// gui
+//     .add(debugObject, 'sunAngularSize')
+//     .min(0)
+//     .max(30)
+//     .step(0.01)
+//     .onChange(()=>
+//     {
+//         const multiplier = Math.tan(debugObject.sunAngularRadius * Math.PI / 180 )/ Math.tan(0.1765 * 2 * Math.PI / 180 );
+//         sunMesh.scale.set(multiplier,multiplier,multiplier);
+//     })
+//     .name("sun angular size(deg)");
 
 /**
  * Lights
@@ -368,23 +417,23 @@ spotLight3.shadow.focus = 1;
 
 scene.add( spotLight3 );
 
-debugObject.headLightOn = true;
-debugObject.superdistance = false;
-gui
-    .add(debugObject, 'headLightOn')
-    .onChange(()=>
-    {
-        spotLight3.intensity = 3 * ( 1 + debugObject.superdistance) * debugObject.headLightOn;
-    })
-    .name("head light switch");
-gui
-    .add(debugObject, 'superdistance')
-    .onChange(()=>
-    {
-        spotLight3.intensity = 3 * ( 1 + debugObject.superdistance) * debugObject.headLightOn;
-        spotLight3.distance = ( debugObject.superdistance ? false : 20000);
-    })
-    .name("superdistance head light");
+// debugObject.headLightOn = true;
+// debugObject.superdistance = false;
+// gui
+//     .add(debugObject, 'headLightOn')
+//     .onChange(()=>
+//     {
+//         spotLight3.intensity = 3 * ( 1 + debugObject.superdistance) * debugObject.headLightOn;
+//     })
+//     .name("head light switch");
+// gui
+//     .add(debugObject, 'superdistance')
+//     .onChange(()=>
+//     {
+//         spotLight3.intensity = 3 * ( 1 + debugObject.superdistance) * debugObject.headLightOn;
+//         spotLight3.distance = ( debugObject.superdistance ? false : 20000);
+//     })
+//     .name("superdistance head light");
     
 /**
  * Sizes
@@ -504,7 +553,7 @@ controls.maxDistance = 120;
 // Background 
 let backgroundColor = Color.hsl(216, 6, 15)
 //debugObject.backgroundColor = backgroundColor.hex()//"#B89B95"
-renderer.setClearColor(debugObject.backgroundColor)
+renderer.setClearColor(backgroundColor.hex())
 // gui
 //     .addColor(debugObject, 'backgroundColor')
 //     .onChange(() =>
@@ -548,23 +597,23 @@ const marsdayDOM = document.getElementById('marsday');
 let marsDays = 0;
 const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
 
-debugObject.sunSpeed = 300.;
-gui
-    .add(debugObject, 'sunSpeed')
-    .min(0)
-    .max(1000)
-    .step(0.1)
-    .name('sun speed')
+// debugObject.sunSpeed = 300.;
+// gui
+//     .add(debugObject, 'sunSpeed')
+//     .min(0)
+//     .max(1000)
+//     .step(0.1)
+//     .name('sun speed')
 
 const tick = () =>
 {
-    stats.begin()
+    //stats.begin()
 
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
     const marsDayInSec = 24*3600 + 37*60;
-    marsDays += deltaTime * debugObject.sunSpeed /marsDayInSec
+    marsDays += deltaTime * 300. /marsDayInSec
     const days = Math.floor(marsDays + 0.5);
     const hours = Math.floor( (marsDays + 0.5 - days) * marsDayInSec / 3600 );
     const minutes = Math.floor((marsDays + 0.5 - days) * marsDayInSec / 60 - hours * 60);
@@ -582,15 +631,17 @@ const tick = () =>
         // update beacon
         const beaconCamDiff = beaconMesh.position.distanceTo(camera.position) - beaconCamDistance;
         beaconMesh.position.y += beaconCamDiff*0.13;
-        camera.position.y += beaconCamDiff*0.13;
+        camera.position.y += beaconCamDiff * 0.13;
         beaconHeight += beaconCamDiff*0.13;
         beaconCamDistance += beaconCamDiff;
-        controls.maxPolarAngle = Math.PI/2 + 2.3 * (1 / beaconHeight - 0.2 );
+        controls.minPolarAngle = Math.PI/2 + 2.2 * (1 / beaconHeight - 0.2 );
+        controls.maxPolarAngle = Math.PI/2 + 2.2 * (1 / beaconHeight - 0.2 );
         // beaconMesh.position.y += capibaraScene.position.distanceTo(camera.position) /2;
         
         // Debug mode
-        //controls.maxPolarAngle = Math.PI;
-        //controls.maxDistance = 100000;
+        // controls.minPolarAngle = 0;
+        // controls.maxPolarAngle = Math.PI;
+        // controls.maxDistance = 100000;
         
 
         // Simulate sun movement and light color
@@ -731,6 +782,7 @@ const tick = () =>
     }
 
     // Render
+    drawMiniMap(pos2d);
     renderer.render(scene, camera)
     // composer.render();
 
@@ -748,7 +800,7 @@ const tick = () =>
     // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 
-    stats.end()
+    //stats.end()
 }
 
 tick()
