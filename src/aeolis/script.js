@@ -218,6 +218,30 @@ gltfLoader.load(
 )
 
 /**
+ * Egyptian Test Model
+ */
+let egyptianScene;
+let egyptianLoaded = false
+
+ gltfLoader.load(
+     '/architect/egyptian.glb',
+     (gltf) =>
+     {
+         egyptianScene = gltf.scene
+          
+         egyptianScene.scale.set(.3, .3, .3)
+         egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
+         //egyptianScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+         //egyptianScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
+         terrGroup.add(egyptianScene)
+         egyptianLoaded = true 
+     }
+ )
+ 
+
+
+
+/**
  * Kapi Neighbor
  */
 let mixer2 = null
@@ -475,7 +499,7 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
     const marsDayInSec = 24*3600 + 37*60;
-    marsDays += deltaTime * 300. /marsDayInSec
+    marsDays += deltaTime * 100. /marsDayInSec
     const days = Math.floor(marsDays + 0.5);
     const hours = Math.floor( (marsDays + 0.5 - days) * marsDayInSec / 3600 );
     const minutes = Math.floor((marsDays + 0.5 - days) * marsDayInSec / 60 - hours * 60);
@@ -583,21 +607,24 @@ const tick = () =>
             pos2d.addScaledVector(vel, deltaTime);
             
             // check if kapi arrived
-            raycaster.set(new THREE.Vector3(pos2d.x, maxHeight , pos2d.y), new THREE.Vector3(0,-1,0))
+            const jmpthr = 3.;
+            raycaster.set(new THREE.Vector3(pos2d.x, capibaraScene.position.y+ jmpthr , pos2d.y), new THREE.Vector3(0,-1,0))
             let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
             if( pos2d.dot(vel) > target2d.dot(vel) || !intersect_vertical || intersect_vertical.length == 0){
                 kapiOnRun = 0;
             }
-            const pos3d = intersect_vertical[0].point;
+            let pos3d = intersect_vertical[0].point;
 
             // check slope
             if(kapiOnRun>0){
                 const normal = intersect_vertical[0].face.normal.normalize();
                 const slope = Math.abs(normal.dot(new THREE.Vector3(0,1,0)));
-                if( slope < 0.5 || Math.abs(pos3d.y - capibaraScene.position.y) > 3 ){
+                //console.log(Math.acos(slope)*180/Math.PI)
+                if( slope < 0.8 || Math.abs(pos3d.y - capibaraScene.position.y) > jmpthr){
                     console.log("slope too steep")
+                    //console.log(slope)
                     kapiOnRun = 0;
-                }    
+                }
             }
 
             // check the collision with the wallGroup
