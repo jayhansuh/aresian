@@ -271,10 +271,10 @@ let egyptianLoaded = false
          console.log(egyptianScene.position)
 
 
-        let egLight1 = new THREE.SpotLight( 0xffffff, 0.4 );
+        let egLight1 = new THREE.SpotLight( 0xffffff, 1.7 );
          egLight1.angle = Math.PI/10;
          egLight1.penumbra = 1;
-         egLight1.distance = 2000;
+         egLight1.distance = 10000;
          egLight1.decay = 2;
 
         egLight1.castShadow = true;
@@ -291,10 +291,10 @@ let egyptianLoaded = false
         scene.add( egLight1 );
 
 
-        let egLight2 = new THREE.SpotLight( 0xffffff, 0.7 );
+        let egLight2 = new THREE.SpotLight( 0xffffff, 2. );
          egLight2.angle = Math.PI;
          egLight2.penumbra = 1;
-         egLight2.distance = 2000;
+         egLight2.distance = 10000;
          egLight2.decay = 2;
 
         egLight2.castShadow = true;
