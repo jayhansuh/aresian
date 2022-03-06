@@ -20,6 +20,7 @@ const minimap_img = new Image();
 minimap_img.src = "/imgs/gale_minimap.jpeg";
 minimap_img.onload = function(){
     minimapOnOff=false;
+    subMenuOnOff("minimapdiv");
 }
 
 function drawMiniMap(pos){
@@ -56,18 +57,33 @@ function drawMiniMap(pos){
 function drawMiniMapEgoCenter(pos){
     if(minimapOnOff){
         const scale = 1/1807/100;
-        const scale2 = 5;
+        const scale2 = 8.5;
         const x = (0.5-(0.5+(pos.x - 24338.93445296312 + 2000)*scale)*scale2 )*minimap_width;
         const y = (0.5-(0.5+(pos.y - 32736.594012823894)*scale)*scale2 )*minimap_height;
         
+        //
         minimap_ctx.clearRect(0,0,canvas.width,canvas.height);
         minimap_ctx.drawImage(minimap_img,x,y,scale2*minimap_width,scale2*minimap_height);
+
+        //Draw Axes
+        minimap_ctx.strokeStyle = '#5224';
+        minimap_ctx.beginPath();
+        minimap_ctx.moveTo(0, minimap_height/2);
+        minimap_ctx.lineTo(minimap_width, minimap_height/2);
+        minimap_ctx.stroke();
+
+        minimap_ctx.beginPath();
+        minimap_ctx.moveTo(minimap_width/2, 0);
+        minimap_ctx.lineTo(minimap_width/2, minimap_height);
+        minimap_ctx.stroke();
+
+        //Draw Ego-Center
         minimap_ctx.beginPath();
         minimap_ctx.arc(minimap_width/2, minimap_height/2, 4, 0, 2 * Math.PI, false);
-        minimap_ctx.fillStyle = 'Salmon';
+        minimap_ctx.fillStyle = '#a66';
         minimap_ctx.fill();
         minimap_ctx.strokewidth=8;
-        minimap_ctx.strokeStyle = 'OrangeRed';
+        minimap_ctx.strokeStyle = '#a42';
         minimap_ctx.stroke();
 
         //Draw direction arrow
@@ -77,10 +93,23 @@ function drawMiniMapEgoCenter(pos){
         minimap_ctx.lineTo(minimap_width/2 + 1.3 * dir.x , minimap_height/2 + 1.3 * dir.y);
         minimap_ctx.lineTo(minimap_width/2 + 0.7 * dir.x + 0.3 * dir.y , minimap_height/2 + 0.7 * dir.y - 0.3 * dir.x);
         minimap_ctx.lineTo(minimap_width/2 + 0.7 * dir.x - 0.3 * dir.y , minimap_height/2 + 0.7* dir.y + 0.3 * dir.x);
-        minimap_ctx.fillStyle = 'Salmon';
+        minimap_ctx.fillStyle = '#a66';
         minimap_ctx.fill();
-        minimap_ctx.strokeStyle = 'OrangeRed';
+        minimap_ctx.strokeStyle = '#a42';
         minimap_ctx.stroke();
+
+        //Draw Scale bar
+        minimap_ctx.beginPath();
+        const barwidth = scale*scale2*minimap_width*1000*5;
+        minimap_ctx.moveTo(10, minimap_height - 15);
+        minimap_ctx.lineTo(10, minimap_height - 10);
+        minimap_ctx.lineTo(10 + barwidth, minimap_height - 10);
+        minimap_ctx.lineTo(10 + barwidth, minimap_height - 15);
+        minimap_ctx.strokeStyle = '#000';
+        minimap_ctx.stroke();
+        minimap_ctx.font = '13px serif';
+        minimap_ctx.fillStyle = 'Black';
+        minimap_ctx.fillText('5km', 10 + barwidth/2 - 11, minimap_height - 15);
 
     }
 }

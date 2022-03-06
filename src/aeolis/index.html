@@ -26,17 +26,21 @@
             flex-direction: row;
             align-items: center;
             justify-content: space-between;
+            z-index: 1;
         }
 
         .menubarContainer{
             position: absolute;
-            top: 0;
+            top: 100vh;
             left: 0;
             width: 100vw;
-            z-index: 1;
+            height: 0;
             font-family: monospace;
             font-size: 14px;
             color: white;
+
+            display: flex;
+            flex-direction: column-reverse;
         }
 
         button{
@@ -51,12 +55,12 @@
                 margin: 40px 10px;
             }
 
-            .menubarContainer{
+            /* .menubarContainer{
                 transform: translateY(calc(100vh - 53px));
                 flex-direction: column-reverse;
                 align-items: center;
                 justify-content: center;
-            }
+            } */
         }
     </style>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -69,12 +73,14 @@
     <div id="touchDiv" style="position: absolute;width:100%;height:100%;z-index: -1;">a</div>
     <canvas class="webgl"></canvas>
 
+
+    <!-- This div prevent double click highlights-->
+    <div style="margin-top: -10px;height:10px;opacity:0;">a</div>
+    
     <div class="menubarContainer">
         <div class="menubar">
 
             <div>
-                <!-- This div prevent double click highlights-->
-                <div style="margin-top: -10px;height:10px;opacity:0;">a</div>
 
                 <button onclick="window.location='/'" style="
                     font-family: EastSeaDokdo;
@@ -104,8 +110,8 @@
             </div>
         </div>
 
-        <div style="display:flex;justify-content: end;">
-            <div id="infodiv" style="display:none;width:400px;height:fit-content;flex-direction:column; z-index:1 ;margin : 5px; padding:10px 20px; background: #fbfbfb80; border-radius: 10px;font-weight: bold; color: black;">
+        <div style="pointer-events:none; display:flex;justify-content: end;">
+            <div id="infodiv" style="display:none;width:400px;height:fit-content;flex-direction:column; z-index:1 ;margin : 5px; padding:10px 20px; background: #fbfbfb80; border-radius: 10px;font-weight: bold; color: black;align-self: flex-end;">
                 <span> Map center coordinates : lon , lat = 137.4° , -4.74° </span>
                 <span> Beacon size : 1m </span>
                 <span> Max speed : 40m/s ( 144 km/h ) </span>
@@ -114,7 +120,7 @@
                 <span> Headlight on on the arrival to the destination</span>
             </div>
 
-            <div id="minimapdiv" style="display:none;width:280px;height:280px;flex-direction:column; z-index:1 ;margin : 5px; padding: 5px; background: #fbfbfb80; border-radius: 13px;font-weight: bold; color: black;">    
+            <div id="minimapdiv" style="display:none;width:280px;height:280px;flex-direction:column; z-index:1 ;margin : 5px; padding: 5px; background: #fbfbfb80; border-radius: 13px;font-weight: bold; color: black;align-self: flex-end;">    
                 <canvas id="minimap" width="270" height="270" style = "width:100%; height:100%;border-radius: 10px;"></canvas>
             </div>
         </div>
