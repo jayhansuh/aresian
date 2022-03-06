@@ -195,6 +195,30 @@ gltfLoader.load(
 )
 
 /**
+ * Egyptian Test Model
+ */
+let egyptianScene;
+let egyptianLoaded = false
+
+ gltfLoader.load(
+     '/architect/egyptian.glb',
+     (gltf) =>
+     {
+         egyptianScene = gltf.scene
+          
+         egyptianScene.scale.set(.3, .3, .3)
+         egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 10, pos2d.y -1500)
+         //egyptianScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+         //egyptianScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
+         scene.add(egyptianScene)
+         egyptianLoaded = true 
+     }
+ )
+ 
+
+
+
+/**
  * Kapi Neighbor
  */
 let mixer2 = null
@@ -510,7 +534,13 @@ const tick = () =>
         }
 
         raycaster.setFromCamera(mouse, camera)
-        let intersect = raycaster.intersectObject(galecrater)
+        let intersect
+        if(egyptianLoaded){
+            intersect = raycaster.intersectObject(egyptianScene)
+        }
+        if(!(intersect) || intersect.length == 0){
+            intersect = raycaster.intersectObject(galecrater)
+        }
         if(galecraterSurroundingloaded && (!(intersect) || intersect.length == 0)){
             intersect = raycaster.intersectObject(galecraterSurrounding)
         }
@@ -528,7 +558,13 @@ const tick = () =>
             }
             
             raycaster.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
-            let intersect_vertical = raycaster.intersectObject(galecrater)
+            let intersect_vertical
+            if(egyptianLoaded){
+                intersect_vertical = raycaster.intersectObject(egyptianScene)
+            }
+            if(!(intersect_vertical) || intersect_vertical.length == 0){
+                intersect_vertical = raycaster.intersectObject(galecrater)
+            }
             if(galecraterSurroundingloaded && (!(intersect_vertical) || intersect_vertical.length == 0)){
                 intersect_vertical = raycaster.intersectObject(galecraterSurrounding)
             }
@@ -552,7 +588,13 @@ const tick = () =>
 
             pos2d.addScaledVector(vel, deltaTime);
             raycaster.set(new THREE.Vector3(pos2d.x, maxHeight , pos2d.y), new THREE.Vector3(0,-1,0))
-            let intersect_vertical = raycaster.intersectObject(galecrater)
+            let intersect_vertical
+            if(egyptianLoaded){
+                intersect_vertical = raycaster.intersectObject(egyptianScene)
+            }
+            if(!(intersect_vertical) || intersect_vertical.length == 0){
+                intersect_vertical = raycaster.intersectObject(galecrater)
+            }
             if(galecraterSurroundingloaded && (!(intersect_vertical) || intersect_vertical.length == 0)){
                 intersect_vertical = raycaster.intersectObject(galecraterSurrounding)
             }
