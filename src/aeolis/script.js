@@ -53,6 +53,38 @@ function drawMiniMap(pos){
     }
 }
 
+function drawMiniMapEgoCenter(pos){
+    if(minimapOnOff){
+        const scale = 1/1807/100;
+        const scale2 = 5;
+        const x = (0.5-(0.5+(pos.x - 24338.93445296312 + 2000)*scale)*scale2 )*minimap_width;
+        const y = (0.5-(0.5+(pos.y - 32736.594012823894)*scale)*scale2 )*minimap_height;
+        
+        minimap_ctx.clearRect(0,0,canvas.width,canvas.height);
+        minimap_ctx.drawImage(minimap_img,x,y,scale2*minimap_width,scale2*minimap_height);
+        minimap_ctx.beginPath();
+        minimap_ctx.arc(minimap_width/2, minimap_height/2, 4, 0, 2 * Math.PI, false);
+        minimap_ctx.fillStyle = 'Salmon';
+        minimap_ctx.fill();
+        minimap_ctx.strokewidth=8;
+        minimap_ctx.strokeStyle = 'OrangeRed';
+        minimap_ctx.stroke();
+
+        //Draw direction arrow
+        const dir = (new Vector2(pos.x - camera.position.x, pos.y - camera.position.z)).normalize().multiplyScalar(10);
+        minimap_ctx.beginPath();
+        minimap_ctx.moveTo(minimap_width/2 + 0.7 * dir.x - 0.3 * dir.y , minimap_height/2 + 0.7* dir.y + 0.3 * dir.x);
+        minimap_ctx.lineTo(minimap_width/2 + 1.3 * dir.x , minimap_height/2 + 1.3 * dir.y);
+        minimap_ctx.lineTo(minimap_width/2 + 0.7 * dir.x + 0.3 * dir.y , minimap_height/2 + 0.7 * dir.y - 0.3 * dir.x);
+        minimap_ctx.lineTo(minimap_width/2 + 0.7 * dir.x - 0.3 * dir.y , minimap_height/2 + 0.7* dir.y + 0.3 * dir.x);
+        minimap_ctx.fillStyle = 'Salmon';
+        minimap_ctx.fill();
+        minimap_ctx.strokeStyle = 'OrangeRed';
+        minimap_ctx.stroke();
+
+    }
+}
+
 function subMenuOnOff(divname){
 
     if(divname=='minimapdiv' && minimapOnOff==null){
@@ -155,7 +187,7 @@ gltfLoader.load(
         gltf.scene.scale.set(scale, scale/3, scale)
         gltf.scene.children[0].material = surfaceMaterial
         gltf.scene.children[0].scale.set(scale, scale/3, scale)
-        gltf.scene.children[0].position.set(10010, (-5486-140)/3, 71324)
+        gltf.scene.children[0].position.set(10010, (-5486)/3 - 2.9, 71324)
         gltf.castShadow = true
         gltf.receiveShadow = true
         console.log(gltf.scene.children[0])
@@ -213,7 +245,7 @@ gltfLoader.load(
         kapiHouseScene.castShadow = true
         kapiHouseScene.receiveShadow = true
 
-        wallGroup.add(kapiHouseScene)
+        terrGroup.add(kapiHouseScene)
     }
 )
 
@@ -222,6 +254,7 @@ gltfLoader.load(
  */
 let egyptianScene;
 let egyptianLoaded = false
+        
 
  gltfLoader.load(
      '/architect/egyptian.glb',
@@ -235,6 +268,47 @@ let egyptianLoaded = false
          //egyptianScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
          terrGroup.add(egyptianScene)
          egyptianLoaded = true 
+         console.log(egyptianScene.position)
+
+
+        let egLight1 = new THREE.SpotLight( 0xffffff, 0.4 );
+         egLight1.angle = Math.PI/10;
+         egLight1.penumbra = 1;
+         egLight1.distance = 2000;
+         egLight1.decay = 2;
+
+        egLight1.castShadow = true;
+        egLight1.shadow.mapSize.width = 512;
+        egLight1.shadow.mapSize.height = 512;
+        egLight1.shadow.camera.near = 10;
+        egLight1.shadow.camera.far = 200;
+        egLight1.shadow.focus = 1;
+
+        egLight1.position.copy(egyptianScene.position).add(new Vector3(0, 1000, 220))
+        egLight1.target.position.copy(egLight1.position).add(new Vector3(0, -2000, 0))
+        egLight1.target.updateMatrixWorld();
+
+        scene.add( egLight1 );
+
+
+        let egLight2 = new THREE.SpotLight( 0xffffff, 0.7 );
+         egLight2.angle = Math.PI;
+         egLight2.penumbra = 1;
+         egLight2.distance = 2000;
+         egLight2.decay = 2;
+
+        egLight2.castShadow = true;
+        egLight2.shadow.mapSize.width = 512;
+        egLight2.shadow.mapSize.height = 512;
+        egLight2.shadow.camera.near = 10;
+        egLight2.shadow.camera.far = 200;
+        egLight2.shadow.focus = 1;
+
+        egLight2.position.copy(egyptianScene.position).add(new Vector3(0, 0, 45))
+        egLight2.target.position.copy(egLight1.position).add(new Vector3(0, 120, 700))
+        egLight2.target.updateMatrixWorld();
+
+        scene.add( egLight2 );
      }
  )
  
@@ -337,21 +411,25 @@ spotLight2.shadow.focus = 1;
 scene.add( spotLight2 );
 
 // head light for kapi
-let spotLight3 = new THREE.SpotLight( 0xffffff, 3 );
-spotLight3.angle = Math.PI / 12;
-spotLight3.penumbra = 0.1;
-spotLight3.distance = 20000;
-spotLight3.decay = 2;
+// let spotLight3 = new THREE.SpotLight( 0xffffff, 1 );
+// spotLight3.angle = Math.PI/9;
+// spotLight3.penumbra = 0.5;
+// spotLight3.distance = 20000;
+// spotLight3.decay = 2;
 
 
-spotLight3.castShadow = true;
-spotLight3.shadow.mapSize.width = 512;
-spotLight3.shadow.mapSize.height = 512;
-spotLight3.shadow.camera.near = 10;
-spotLight3.shadow.camera.far = 200;
-spotLight3.shadow.focus = 1;
+// spotLight3.castShadow = true;
+// spotLight3.shadow.mapSize.width = 512;
+// spotLight3.shadow.mapSize.height = 512;
+// spotLight3.shadow.camera.near = 10;
+// spotLight3.shadow.camera.far = 200;
+// spotLight3.shadow.focus = 1;
 
-scene.add( spotLight3 );
+// spotLight3.position.set(pos2d.x, (-2118.8256403156556 -1)/3 -500, pos2d.y +1300)
+// spotLight3.target.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
+// spotLight3.target.updateMatrixWorld();
+
+// scene.add( spotLight3 );
 
 /**
  * Sizes
@@ -430,7 +508,7 @@ const controls = new OrbitControls( camera, renderer.domElement)
 // 	RIGHT: THREE.MOUSE.PAN,
 // }
 // controls.target = beaconMesh.position;
-controls.minDistance = 8;
+controls.minDistance = 12;
 controls.maxDistance = 50;
 let beaconCamDistance = 50;
 controls.maxPolarAngle = Math.PI/2///1.7 // / 2.5;
@@ -464,15 +542,19 @@ scene.fog = new THREE.Fog(backgroundColor.hex() , near , far );
 /**
  * Raycaster
  */
+const raycaster_far = new THREE.Raycaster()
 const raycaster = new THREE.Raycaster()
+raycaster.far = 10
+const jmpthr = 3.;
+
 // raycaster.params.Points.threshold = 0.1
 // raycaster.params.Line.threshold = 0.1
 // raycaster.params.Mesh.threshold = 0.1
 // ground setting
 const groundObjs = [galecrater,galecraterSurrounding];
 function getIntersect(){
-    raycaster.setFromCamera(mouse, camera);
-    let intersects = raycaster.intersectObjects(groundObjs);
+    raycaster_far.setFromCamera(mouse, camera);
+    let intersects = raycaster_far.intersectObjects(groundObjs);
     if (intersects.length > 0) {
         return intersects[0]
     }
@@ -490,6 +572,7 @@ let kapiOnRun = -1;
 const marsdayDOM = document.getElementById('marsday');
 
 let marsDays = 0;
+let timespeed = 150.;
 const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
 
 const tick = () =>
@@ -499,7 +582,7 @@ const tick = () =>
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
     const marsDayInSec = 24*3600 + 37*60;
-    marsDays += deltaTime * 100. /marsDayInSec
+    marsDays += deltaTime * timespeed /marsDayInSec
     const days = Math.floor(marsDays + 0.5);
     const hours = Math.floor( (marsDays + 0.5 - days) * marsDayInSec / 3600 );
     const minutes = Math.floor((marsDays + 0.5 - days) * marsDayInSec / 60 - hours * 60);
@@ -511,24 +594,26 @@ const tick = () =>
     // Update controls
     controls.update()
 
-    // Cast a ray
+    // Cast a ray 
     if (galecraterloaded){
 
         // update beacon
-        const beaconCamDiff = beaconMesh.position.distanceTo(camera.position) - beaconCamDistance;
-        beaconMesh.position.y += beaconCamDiff*0.13;
-        camera.position.y += beaconCamDiff * 0.13;
-        beaconHeight += beaconCamDiff*0.13;
+        let beaconCamDiff = beaconMesh.position.distanceTo(camera.position) - beaconCamDistance;
         beaconCamDistance += beaconCamDiff;
-        controls.minPolarAngle = Math.PI/2 + 2.2 * (1 / beaconHeight - 0.2 );
-        controls.maxPolarAngle = Math.PI/2 + 2.2 * (1 / beaconHeight - 0.2 );
+        
+        beaconCamDiff = beaconCamDiff * 0.102;
+        beaconMesh.position.y += beaconCamDiff;
+        camera.position.y += beaconCamDiff;
+        beaconHeight += beaconCamDiff;
+        controls.minPolarAngle = Math.PI/2 + 2.4 * (1 / ((beaconHeight-8)*1.3+8) - 0.2 );
+        controls.maxPolarAngle = Math.PI/2 + 2.4 * (1 / ((beaconHeight-8)*1.3+8)  - 0.2 );
+        //console.log(capibaraScene.position.y - camera.position.y)
         
         // Debug mode
         // controls.minPolarAngle = 0;
         // controls.maxPolarAngle = Math.PI;
         // controls.maxDistance = 100000;
         
-
         // Simulate sun movement and light color
         sundir = new THREE.Vector3(0,1,0);
         sundir.applyAxisAngle( new Vector3(0,0,1), marsDays/marsYearInmarsDay * Math.PI * 2);
@@ -537,6 +622,7 @@ const tick = () =>
         sundir.applyAxisAngle( new Vector3(1,0,0), - lat );
         directionalLight.position.copy(sundir);
         const sunind = sundir.dot(new Vector3(0,1,0));
+        timespeed = sunind > 0 ? 300 : 900;
         sunMesh.position.copy(sundir.multiplyScalar(sunDistance));
         directionalLight.intensity = ( sunind > 0.2 ? 0.6 : (sunind < -0.2 ? 0 : 0.3+ 0.6/0.4 * sunind));
         const suhem = [ 0.82 , 0.3, 0.];
@@ -557,8 +643,8 @@ const tick = () =>
         hemisphereLight.color.set(hemicolor);        
 
         if(kapiOnRun<0){//This is for the initial loading
-            raycaster.set(new THREE.Vector3(pos2d.x, maxHeight ,pos2d.y), new THREE.Vector3(0,-1,0))
-            const intersect = raycaster.intersectObject(galecrater)
+            raycaster_far.set(new THREE.Vector3(pos2d.x, maxHeight ,pos2d.y), new THREE.Vector3(0,-1,0))
+            const intersect = raycaster_far.intersectObject(galecrater)
             if( intersect && intersect.length != 0){
                 const pos3d = intersect[0].point;
                 capibaraScene.position.copy(pos3d);
@@ -569,8 +655,8 @@ const tick = () =>
             }
         }
 
-        raycaster.setFromCamera(mouse, camera);
-        let intersect = raycaster.intersectObjects(terrGroup.children , true );
+        raycaster_far.setFromCamera(mouse, camera);
+        let intersect = raycaster_far.intersectObjects(terrGroup.children , true );
 
         if (mouseOnClick && intersect.length != 0)
         {
@@ -584,8 +670,8 @@ const tick = () =>
                 capibaraScene.rotation.y = Math.PI/2- phi;
             }
             
-            raycaster.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
-            let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
+            raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
+            let intersect_vertical = raycaster_far.intersectObjects(terrGroup.children , true );
             if( intersect_vertical && intersect_vertical.length != 0){
                 console.log(intersect_vertical[0].point)
                 spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
@@ -594,6 +680,7 @@ const tick = () =>
                 spotLight2.target.updateMatrixWorld();
                 
                 // kapi running animation
+                console.log('kapiOnRun', kapiOnRun)
                 action.stop()
                 action = mixer.clipAction(capybaraAnimation[3])
                 action.play()
@@ -607,36 +694,44 @@ const tick = () =>
             pos2d.addScaledVector(vel, deltaTime);
             
             // check if kapi arrived
-            const jmpthr = 3.;
             raycaster.set(new THREE.Vector3(pos2d.x, capibaraScene.position.y+ jmpthr , pos2d.y), new THREE.Vector3(0,-1,0))
             let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
-            if( pos2d.dot(vel) > target2d.dot(vel) || !intersect_vertical || intersect_vertical.length == 0){
+            if( pos2d.dot(vel) > target2d.dot(vel)){
+                console.log('kapi arrived')
                 kapiOnRun = 0;
             }
-            let pos3d = intersect_vertical[0].point;
+            else if(!intersect_vertical || intersect_vertical.length == 0){
+                kapiOnRun = -1;
+                console.log('kapi can not reach target')
+            }
+            let pos3d;
 
             // check slope
             if(kapiOnRun>0){
-                const normal = intersect_vertical[0].face.normal.normalize();
-                const slope = Math.abs(normal.dot(new THREE.Vector3(0,1,0)));
+                pos3d = intersect_vertical[0].point;
+                //const normal = intersect_vertical[0].face.normal.normalize();
+                //const slope = Math.abs(normal.dot(new THREE.Vector3(0,1,0)));
                 //console.log(Math.acos(slope)*180/Math.PI)
-                if( slope < 0.8 || Math.abs(pos3d.y - capibaraScene.position.y) > jmpthr){
+                //if( slope < 0.8 || Math.abs(pos3d.y - capibaraScene.position.y) > jmpthr){
+                if( Math.abs((pos3d.y - capibaraScene.position.y)/(vel.length()*deltaTime)) > jmpthr){
                     console.log("slope too steep")
                     //console.log(slope)
-                    kapiOnRun = 0;
+                    kapiOnRun = -1;
                 }
             }
 
             // check the collision with the wallGroup
-            // if(kapiOnRun>0){
-            //     raycaster.set(capibaraScene.position, new Vector3(vel.x, 0, vel.y));
-            //     const intersect_view = raycaster.intersectObjects(terrGroup, true );
-            //     console.log(intersect_view)
-            //     if( intersect_view && intersect_view.length != 0 && intersect_view[0].distance < 1000){
-            //         console.log("collision with wall")
-            //         kapiOnRun = 0;
-            //     }
-            // }
+            if(kapiOnRun>0){
+                const normvel = (new Vector3(vel.x,0,vel.y)).normalize().multiplyScalar(jmpthr/10);
+                const feetpos = (new Vector3(0,jmpthr/2,0)).add(capibaraScene.position);
+                raycaster.set(feetpos,normvel);
+                const travelDist = capibaraScene.position.distanceTo(pos3d);
+                let intersect_view = raycaster.intersectObjects( terrGroup.children, true );
+                if( intersect_view && intersect_view.length != 0 && intersect_view[0].distance < travelDist + jmpthr/2){
+                    console.log("collision with wall")
+                    kapiOnRun = -1;
+                }
+            }
 
             // kapi walking animation
             if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
@@ -647,9 +742,9 @@ const tick = () =>
                 action = mixer.clipAction(capybaraAnimation[4])
                 action.play()
 
-                spotLight3.position.copy(beaconMesh.position)
-                spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
-                spotLight3.target.updateMatrixWorld();
+                // spotLight3.position.copy(beaconMesh.position)
+                // spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
+                // spotLight3.target.updateMatrixWorld();
             }
 
             if( kapiOnRun > 0){
@@ -657,7 +752,18 @@ const tick = () =>
                 capibaraScene.position.copy(pos3d);
                 beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
             }
-            else {
+            else{
+                if(kapiOnRun == -1){
+                    pos2d.addScaledVector(vel, -1*deltaTime);
+                    raycaster.set(new THREE.Vector3(pos2d.x, capibaraScene.position.y+ jmpthr , pos2d.y), new THREE.Vector3(0,-1,0))
+                    let intersect_vertical2 = raycaster.intersectObjects(terrGroup.children , true );
+                    if( intersect_vertical2 && intersect_vertical2.length != 0){
+                        pos3d = intersect_vertical2[0].point;
+                        camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
+                        capibaraScene.position.copy(pos3d);
+                        beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
+                    }
+                }
                 action.stop()
                 action = mixer.clipAction(capybaraAnimation[1])
                 action.play()
@@ -678,7 +784,7 @@ const tick = () =>
     }
 
     // Render
-    drawMiniMap(pos2d);
+    drawMiniMapEgoCenter(pos2d);
     renderer.render(scene, camera)
 
     // Call tick again on the next frame
