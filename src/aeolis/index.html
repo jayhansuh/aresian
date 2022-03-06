@@ -14,11 +14,48 @@
             cursor: pointer;
         }
 
+
+        .menubar{
+            position: relative;
+            width: 100vw;
+            height: 53px;
+            background: #746a61f0;
+            touch-action: none;
+            
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .menubarContainer{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            z-index: 1;
+            font-family: monospace;
+            font-size: 14px;
+            color: white;
+        }
+
+        button{
+            background: transparent;
+            padding: 0 8px;
+            color:white;
+        }
         /* responsive class */
         @media only screen and (max-width: 800px) {
             .gui_container {
                 flex-direction: column;
                 margin: 40px 10px;
+            }
+
+            .menubarContainer{
+                transform: translateY(calc(100vh - 53px));
+                flex-direction: column-reverse;
+                align-items: center;
+                justify-content: center;
             }
         }
     </style>
@@ -28,24 +65,66 @@
     <title> Aeolis City(Gale Crater) </title>
 </head>
 <body>
+
+    <div id="touchDiv" style="position: absolute;width:100%;height:100%;z-index: -1;"></div>
     <canvas class="webgl"></canvas>
-    <div id="gui_container" class="gui_container">
-        <div style="display:flex;flex-direction:column; z-index:1 ;margin : 5px; padding:10px 20px; background: #fbfbfb80; border-radius: 10px; font-family: monospace;">
-            <div style="display: flex;justify-content: space-between; margin-right:-5px; margin-bottom: 5px;">
-                <span style="font-weight: bold;"> Gale Crater</span>
-                <a onclick="document.getElementById('gui_container').remove();"><span class="material-icons" style="font-size:14px">cancel</span></a>
+    
+    <div class="menubarContainer">
+
+        <div class="menubar">
+
+            <div>
+                <button onclick="window.location='/'" style="
+                    font-family: EastSeaDokdo;
+                    font-size: 38px;">
+                    Aresian
+                </button>
             </div>
-            <div style = "display: flex;"> <div id ="marsday"></div> </div>
-            <span> Map center coordinates : lon , lat = 137.4° , -4.74° </span>
-            <span> Beacon size : 1m </span>
-            <span> Max speed : 40m/s ( 144 km/h )</span>
-            <span> Drag to pan the view</span>
-            <span> Double click(or touch) to set a destination</span>
-            <span> Headlight on on the arrival to the destination</span>
+
+
+            <div>
+                Aeolis city(Gale crater, Mars)
+            </div>
+
+            <div style="margin: 2px 8px;
+                display: flex;
+                align-items: center;">
+                
+                <div style = "display: flex;width: 500px; margin: 0 12px; width: 224px; text-align: end;"> <div id ="marsday"></div> </div>
+                
+                <button onclick="subMenuOnOff('infodiv');">
+                    <i class="material-icons">info</i>
+                </button>
+                
+                <button onclick="subMenuOnOff('minimapdiv')">
+                    <i class="material-icons">explore</i>
+                </button>
+            </div>
         </div>
-        <div id="gui-div">
-            
+
+        <div style="display:flex;justify-content: end;">
+            <div id="infodiv" style="display:none;width:400px;height:fit-content;flex-direction:column; z-index:1 ;margin : 5px; padding:10px 20px; background: #fbfbfb80; border-radius: 10px;font-weight: bold; color: black;">
+                <span> Map center coordinates : lon , lat = 137.4° , -4.74° </span>
+                <span> Beacon size : 1m </span>
+                <span> Max speed : 40m/s ( 144 km/h ) </span>
+                <span> Drag to pan the view</span>
+                <span> Double click(or touch) to set a destination</span>
+                <span> Headlight on on the arrival to the destination</span>
+            </div>
+
+            <div id="minimapdiv" style="display:none;width:330px;height:330px;flex-direction:column; z-index:1 ;margin : 5px; padding: 5px; background: #fbfbfb80; border-radius: 13px;font-weight: bold; color: black;">    
+                <canvas id="minimap" width="370" height="370" style = "width:100%; height:100%;border-radius: 10px;"></canvas>
+            </div>
         </div>
+
     </div>
+
+
+   
+
+    
+    
+    
+
 </body>
 </html>
