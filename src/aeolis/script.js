@@ -295,17 +295,18 @@ let egyptianLoaded = false
          egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
          //egyptianScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
          //egyptianScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
-         terrGroup.add(egyptianScene)
+         scene.add(egyptianScene)
          egyptianLoaded = true 
          console.log(egyptianScene.position)
 
 
-        let egLight1 = new THREE.SpotLight( 0xffffff, 1.7 );
-         egLight1.angle = Math.PI/10;
-         egLight1.penumbra = 1;
-         egLight1.distance = 10000;
-         egLight1.decay = 2;
+        let egLight1 = new THREE.PointLight("#F7C49F", 0.1 );
+        //  egLight1.angle = Math.PI/10;
+        //  egLight1.penumbra = 1;
+        //  egLight1.distance = 10000;
+        //  egLight1.decay = 2;
 
+        const sphereSize = 30;
         egLight1.castShadow = true;
         egLight1.shadow.mapSize.width = 512;
         egLight1.shadow.mapSize.height = 512;
@@ -313,18 +314,20 @@ let egyptianLoaded = false
         egLight1.shadow.camera.far = 200;
         egLight1.shadow.focus = 1;
 
-        egLight1.position.copy(egyptianScene.position).add(new Vector3(0, 1000, 220))
-        egLight1.target.position.copy(egLight1.position).add(new Vector3(0, -2000, 0))
-        egLight1.target.updateMatrixWorld();
+        egLight1.position.copy(egyptianScene.position).add(new Vector3(-5, 30, 270))
+        //egLight1.target.position.copy(egLight1.position).add(new Vector3(0, -2000, 0))
+        //egLight1.target.updateMatrixWorld();
 
         scene.add( egLight1 );
+        const pointLightHelper1 = new THREE.PointLightHelper( egLight1, sphereSize );
+        //scene.add( pointLightHelper1 );
 
 
-        let egLight2 = new THREE.SpotLight( 0xffffff, 2. );
-         egLight2.angle = Math.PI;
-         egLight2.penumbra = 1;
-         egLight2.distance = 10000;
-         egLight2.decay = 2;
+        let egLight2 = new THREE.PointLight( "#F7C49F", 0.1 );
+        //  egLight2.angle = Math.PI;
+        //  egLight2.penumbra = 1;
+        //  egLight2.distance = 10000;
+        //  egLight2.decay = 2;
 
         egLight2.castShadow = true;
         egLight2.shadow.mapSize.width = 512;
@@ -333,9 +336,12 @@ let egyptianLoaded = false
         egLight2.shadow.camera.far = 200;
         egLight2.shadow.focus = 1;
 
-        egLight2.position.copy(egyptianScene.position).add(new Vector3(0, 0, 45))
-        egLight2.target.position.copy(egLight1.position).add(new Vector3(0, 120, 700))
-        egLight2.target.updateMatrixWorld();
+        egLight2.position.copy(egyptianScene.position).add(new Vector3(-5, 30, 110))
+        
+        const pointLightHelper2 = new THREE.PointLightHelper( egLight2, sphereSize );
+        //scene.add( pointLightHelper2 );
+        //egLight2.target.position.copy(egLight1.position).add(new Vector3(0, 120, 700))
+        //egLight2.target.updateMatrixWorld();
 
         scene.add( egLight2 );
      }
@@ -424,7 +430,7 @@ let season = Math.random() * 2 * Math.PI;
 scene.add(directionalLight)
 
 // spot light for target
-let spotLight2 = new THREE.SpotLight( 0xffffff, 1 );
+let spotLight2 = new THREE.SpotLight( 0xffffff, 0.5 );
 spotLight2.angle = Math.PI / 16;
 spotLight2.penumbra = 0;
 spotLight2.decay = 0;
@@ -526,6 +532,7 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.outputEncoding = THREE.sRGBEncoding
 
 /**
  * Controls
