@@ -6,6 +6,114 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
 import { Sphere, sRGBEncoding, TextureLoader, Vector2, Vector3 } from 'three';
 const Color = require('color');
 
+const neighbors = {};
+const { io } = require("socket.io-client");
+const socket = io();
+socket.on("connect", () => {
+    const engine = socket.io.engine;
+    console.log(engine.transport.name); // in most cases, prints "polling"
+
+    engine.once("upgrade", () => {
+        // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
+        console.log(engine.transport.name); // in most cases, prints "websocket"
+    });
+
+    socket.on('set', (data) => {
+        if(data.id!==socket.id && capibaraScene){
+            if(!(data.id in neighbors)){
+                console.log("add neighbor");
+                
+                neighbors[data.id] = {};
+                
+
+                gltfLoader.load(
+                    '/models/capybara.glb',
+                    (gltf) =>
+                    { 
+                        const neighbor = gltf.scene
+                        const anim = gltf.animations
+                        
+                        neighbor.scale.set(.2, .2, .2)
+                        neighbor.position.set(pos2d.x, (-2118.8256403156556 +0.2)/3, pos2d.y)
+                        scene.add(neighbor)
+                
+                        // Animation
+                        const mixer2 = new THREE.AnimationMixer(neighbor)
+                        const action2 = mixer2.clipAction(anim[1])
+                        action2.play()
+
+                        neighbors[data.id] = {
+                            'scene':neighbor,
+                            'socketid':data.id,
+                            'anim':anim,
+                            'mixer':mixer2,
+                            'action':action2,
+                        }
+                    }
+                )
+                
+            }
+
+            neighbors[data.id][data.attr] = data.val;
+            if('scene' in neighbors[data.id]){
+                const neighbor = neighbors[data.id]['scene'];
+                if(data.attr=='pos3d'){
+                    neighbor.position.set(data.val.x, data.val.y, data.val.z)
+                }
+                else if(data.attr=='rotation'){
+                    neighbor.rotation.y = data.val
+                }
+                else if(data.attr=='kapiOnRun'){
+                    const { mixer, action , anim } = neighbors[data.id];
+                    action.stop()
+                    action = mixer.clipAction(anim[( data.val==2 ? 3 : 1)])
+                    action.play()
+                }
+            }
+                
+        }
+    });
+
+    socket.on('removeNeighbor', (id) => {
+        if(id in neighbors){
+            neighbors[id]['scene'].visible = false;
+            delete neighbors[id]['scene'];
+            delete neighbors[id];
+        }
+    });
+
+    // engine.on("packet", ({ type, data }) => {
+    //     console.log(type, data);
+    //     switch(type){
+    //         case "set":
+    //             console.log("set", data);
+    //             break;
+    //         case "add_user":
+    //             console.log("add_user", data);
+    //             break;
+    //         case "disconnect":
+    //             console.log("disconnect", data);
+    //             break;
+    //         default:
+    //             console.log("unknown", type, data);
+    //     }
+    // });
+
+    engine.on("packetCreate", ({ type, data }) => {
+        // called for each packet sent
+    });
+
+    engine.on("drain", () => {
+        // called when the write buffer is drained
+    });
+
+    engine.on("close", (reason) => {
+        // called when the underlying connection is closed
+    });
+});
+
+
+
 /**
  * Minimap & Menubar buttons
  */
@@ -372,6 +480,7 @@ let capibaraScene2
     }
 )
 
+
 /**
  * Beacon
  */
@@ -602,9 +711,11 @@ let target2d = new Vector2(0,0);
 let kapiOnRun = -1;
 const marsdayDOM = document.getElementById('marsday');
 
-let marsDays = 0;
+let marsDays = Date.now()/1000;
 let timespeed = 150.;
 const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
+
+let reportTime = 0;
 
 const tick = () =>
 {
@@ -612,6 +723,13 @@ const tick = () =>
     const elapsedTime = clock.getElapsedTime()
     const deltaTime = elapsedTime - previousTime
     previousTime = elapsedTime
+
+    reportTime += deltaTime;
+    if(reportTime > 0.03 && capibaraScene){
+        reportTime = 0;
+        socket.emit('set',{'attr':'pos3d', 'val':{x:capibaraScene.position.x , y:capibaraScene.position.y , z:capibaraScene.position.z}});
+    }           
+
     const marsDayInSec = 24*3600 + 37*60;
     marsDays += deltaTime * timespeed /marsDayInSec
     const days = Math.floor(marsDays + 0.5);
@@ -696,12 +814,15 @@ const tick = () =>
             if(intersect && intersect.length > 0){
                 const collidingSurface = intersect[0].point
                 target2d = new THREE.Vector2(collidingSurface.x, collidingSurface.z );
+                socket.emit('set',{attr:'target2d', val:{x: collidingSurface.x, y: collidingSurface.z}});
+                
                 vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40);//144 km/h
                 
                 // rotate the object to orient it to the target2d
                 const phi = Math.atan2(vel.y, vel.x);
                 if(phi){
                     capibaraScene.rotation.y = Math.PI/2- phi;
+                    socket.emit('set',{attr:'rotation', val:capibaraScene.rotation.y});
                 }
                 
                 raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
@@ -719,6 +840,7 @@ const tick = () =>
                     action = mixer.clipAction(capybaraAnimation[3])
                     action.play()
                     kapiOnRun = 2;
+                    socket.emit('set',{attr:'kapiOnRun', val:kapiOnRun});
                 }
             }
         }
@@ -777,18 +899,18 @@ const tick = () =>
             }
 
             // kapi walking animation
-            if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
-                vel.multiplyScalar(0.07);
-                kapiOnRun = 1;
-                spotLight2.intensity = .3;
-                action.stop()
-                action = mixer.clipAction(capybaraAnimation[4])
-                action.play()
+            // if( kapiOnRun == 2 && pos2d.distanceTo(target2d) < 12){
+            //     vel.multiplyScalar(0.07);
+            //     kapiOnRun = 1;
+            //     spotLight2.intensity = .3;
+            //     action.stop()
+            //     action = mixer.clipAction(capybaraAnimation[4])
+            //     action.play()
 
-                // spotLight3.position.copy(beaconMesh.position)
-                // spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
-                // spotLight3.target.updateMatrixWorld();
-            }
+            //     // spotLight3.position.copy(beaconMesh.position)
+            //     // spotLight3.target.position.copy(beaconMesh.position).add(new Vector3(vel.x,0,vel.y))
+            //     // spotLight3.target.updateMatrixWorld();
+            // }
 
             if( kapiOnRun > 0){
                 camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
@@ -811,6 +933,7 @@ const tick = () =>
                 action = mixer.clipAction(capybaraAnimation[1])
                 action.play()
                 kapiOnRun = 0;
+                socket.emit('set',{attr:'kapiOnRun', val:kapiOnRun});
                 spotLight2.intensity = 0;
             }
         }
