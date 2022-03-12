@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
-import { Sphere, TextureLoader, Vector2, Vector3 } from 'three';
+import { Sphere, sRGBEncoding, TextureLoader, Vector2, Vector3 } from 'three';
 const Color = require('color');
 
 /**
@@ -261,15 +261,16 @@ gltfLoader.load(
 let kapiHouseScene;
 
 gltfLoader.load(
-    '/architect/soilhouse1.glb',
+    '/architect/house_simple.glb',
     (gltf) =>
     {
         kapiHouseScene = gltf.scene
          
-        kapiHouseScene.scale.set(.3, .3, .3)
-        kapiHouseScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3, pos2d.y -10)
-        kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
-        kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
+        //kapiHouseScene.scale.set(.3, .3, .3)
+        kapiHouseScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 - 6.5, pos2d.y -50)
+        //kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+        //kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
+        kapiHouseScene.rotateOnAxis(new Vector3(0, 1, 0), Math.PI)
 
         kapiHouseScene.castShadow = true
         kapiHouseScene.receiveShadow = true
@@ -526,6 +527,7 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.outputEncoding = THREE.sRGBEncoding
 
 /**
  * Controls
