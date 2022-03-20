@@ -375,7 +375,7 @@ let egyptianScene;
 let egyptianLoaded = false
 
  gltfLoader.load(
-     '/architect/egyptian.glb',
+     '/aeoliscity/Temple/Temple_Administrator.glb',
      (gltf) =>
      {
          egyptianScene = gltf.scene
@@ -1051,7 +1051,7 @@ const tick = () =>
             
             socket.emit('set',{attr:'target2d', val:{x: target2d.x, y: target2d.z}});
             
-            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40);//144 km/h
+            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40/2);//144/2 km/h
             
             // rotate the object to orient it to the target2d
             const phi = Math.atan2(vel.y, vel.x);
@@ -1114,7 +1114,7 @@ const tick = () =>
             let isStairs;
             if(kapiOnRun>0){
                 pos3d = intersect_vertical[0].point;
-                isStairs = (intersect_vertical[0].object.name.slice(0,6)=="stairs");
+                isStairs = (intersect_vertical[0].object.name.slice(0,5)=="stair");
                 //const normal = intersect_vertical[0].face.normal.normalize();
                 //const slope = Math.abs(normal.dot(new THREE.Vector3(0,1,0)));
                 //console.log(Math.acos(slope)*180/Math.PI)
