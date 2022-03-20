@@ -161,11 +161,6 @@ scene.add(wallGroup)
  */
 const surfaceMaterial = new THREE.MeshStandardMaterial({ color: "rgb(158,102,76)" })
 
-// /**
-//  * Lod
-//  */
-// const lod = new THREE.LOD();
-
 /** 
  * Surface GLTF loader
  */
@@ -191,6 +186,7 @@ const scale = 1807
         galecrater.scale.set(scale, scale/3, scale)
         gltf.castShadow = true
         gltf.receiveShadow = true
+        console.log("marsGale_small.glb")
         console.log(gltf.scene.children[0])
 
         terrGroup.add(gltf.scene.children[0])
@@ -219,6 +215,7 @@ gltfLoader.load(
         gltf.scene.children[0].position.set(10010, (-5486)/3 - 2.9, 71324)
         gltf.castShadow = true
         gltf.receiveShadow = true
+        console.log("galecrater_whole")
         console.log(gltf.scene.children[0])
 
         terrGroup.add(gltf.scene.children[0])
@@ -256,35 +253,10 @@ gltfLoader.load(
 )
 
 /**
- * Kapi House Model
- */
-let kapiHouseScene;
-
-gltfLoader.load(
-    '/architect/house_simple.glb',
-    (gltf) =>
-    {
-        kapiHouseScene = gltf.scene
-         
-        //kapiHouseScene.scale.set(.3, .3, .3)
-        kapiHouseScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 - 6.5, pos2d.y -50)
-        //kapiHouseScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
-        //kapiHouseScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
-        kapiHouseScene.rotateOnAxis(new Vector3(0, 1, 0), Math.PI)
-
-        kapiHouseScene.castShadow = true
-        kapiHouseScene.receiveShadow = true
-
-        terrGroup.add(kapiHouseScene)
-    }
-)
-
-/**
  * Egyptian Test Model
  */
 let egyptianScene;
 let egyptianLoaded = false
-        
 
  gltfLoader.load(
      '/architect/egyptian.glb',
@@ -294,12 +266,8 @@ let egyptianLoaded = false
           
          egyptianScene.scale.set(.3, .3, .3)
          egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
-         //egyptianScene.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
-         //egyptianScene.rotateOnAxis(new Vector3(0, 0, 1), + 0.03)
          terrGroup.add(egyptianScene)
          egyptianLoaded = true 
-         console.log(egyptianScene.position)
-
 
         let egLight1 = new THREE.SpotLight( 0xffffff, 1.7 );
          egLight1.angle = Math.PI/10;
@@ -341,8 +309,6 @@ let egyptianLoaded = false
         scene.add( egLight2 );
      }
  )
- 
-
 
 
 /**
@@ -375,9 +341,7 @@ let capibaraScene2
 /**
  * Beacon
  */
-
 let beaconHeight = 8;
-
 const beaconMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true })
 const beaconGeometry = new THREE.SphereGeometry(0.5, 4, 2)
 const beaconMesh = new THREE.Mesh( beaconGeometry, beaconMaterial)
@@ -516,6 +480,80 @@ window.addEventListener('touchend', (_event)=>
 const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 0.1, 110 * 1000)
 scene.add(camera)
 
+
+/**
+ * Kapi House Model High Resolution
+ */
+let kapiHouseSceneHRLoaded = false
+let kapiHouseSceneLRLoaded = false
+let kapiHouseSceneHR
+let kapiHouseSceneLR
+let distanceToHouse
+let kapiHouseClonePosition = new Vector3(0, 0, 0)
+
+gltfLoader.load(
+    '/architect/house_simple.glb',
+    (gltf) =>
+    {
+        kapiHouseSceneHR = gltf.scene
+        kapiHouseSceneHR.position.set(pos2d.x, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50)
+        kapiHouseSceneHR.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+        kapiHouseSceneHR.rotateOnAxis(new Vector3(0, 1, 0), Math.PI)
+        kapiHouseSceneHR.castShadow = true
+        kapiHouseSceneHR.receiveShadow = true
+        kapiHouseSceneHRLoaded = true
+
+        for(let i = -20; i < 20; i++){
+            for (let j = 0; j < 20; j++){
+                kapiHouseClonePosition.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
+                distanceToHouse = camera.position.clone().distanceTo(kapiHouseClonePosition) 
+                if (distanceToHouse < 300){
+                    let kapiHouseHRClone = kapiHouseSceneHR.clone()
+                    kapiHouseHRClone.position.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
+                    terrGroup.add(kapiHouseHRClone)
+                }
+            }
+        }
+    } 
+)
+
+/** 
+ * Kapi House Model Low Resolution
+ */
+
+gltfLoader.load(
+    '/architect/house_simple_lr.glb',
+    (gltf) =>
+    {
+        kapiHouseSceneLR = gltf.scene
+        kapiHouseSceneLR.position.set(pos2d.x, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50)
+        kapiHouseSceneLR.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
+        kapiHouseSceneLR.rotateOnAxis(new Vector3(0, 1, 0), Math.PI)
+        kapiHouseSceneLR.castShadow = true 
+        kapiHouseSceneLR.receiveShadow = true
+
+        for(let i = -20; i < 20; i++){
+            for (let j = 0; j < 20; j++){
+                kapiHouseClonePosition.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
+                distanceToHouse = camera.position.clone().distanceTo(kapiHouseClonePosition) 
+                if (distanceToHouse > 300){
+                    let kapiHouseHRClone = kapiHouseSceneLR.clone()
+                    kapiHouseHRClone.position.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
+                    terrGroup.add(kapiHouseHRClone)
+                }
+            }
+        } 
+    }
+)
+
+
+// In the tick function
+// if (kapiHouseSceneHRLoaded && kapiHouseSceneLRLoaded){
+//     change the object HR to LR or LR to HR based on the distance from the camera to each object
+// }
+
+
+
 /**
  * Renderer
  */
@@ -527,7 +565,7 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.outputEncoding = THREE.sRGBEncoding
+renderer.outputEncoding = sRGBEncoding
 
 /**
  * Controls
@@ -639,8 +677,6 @@ const tick = () =>
         controls.minPolarAngle = Math.PI/2 + 2.4 * (1 / ((beaconHeight-8)*1.3+8) - 0.2 );
         controls.maxPolarAngle = Math.PI/2 + 2.4 * (1 / ((beaconHeight-8)*1.3+8)  - 0.2 );
         //console.log(capibaraScene.position.y - camera.position.y)
-        
-        
 
         // Debug mode
         // controls.minPolarAngle = 0;
@@ -688,7 +724,6 @@ const tick = () =>
             }
         }
 
-        
         if (mouseOnClick)
         {
             raycaster_far.setFromCamera(mouse, camera);
@@ -707,7 +742,8 @@ const tick = () =>
                 raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
                 let intersect_vertical = raycaster_far.intersectObjects(terrGroup.children , true );
                 if( intersect_vertical && intersect_vertical.length != 0){
-                    console.log(intersect_vertical[0].point)
+                    //console.log("target position:")
+                    //console.log(intersect_vertical[0].point)
                     spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
                     spotLight2.target.position.copy(intersect_vertical[0].point)
                     spotLight2.intensity = 2.;
