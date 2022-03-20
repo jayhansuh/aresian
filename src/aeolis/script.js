@@ -43,7 +43,7 @@ socket.on("connect", () => {
                         
                         neighbor.scale.set(.2, .2, .2)
                         neighbor.position.set(pos2d.x, (-2118.8256403156556 +0.2)/3, pos2d.y)
-                        scene.add(neighbor)
+                        unitGroup.add(neighbor)
                 
                         // Animation
                         let mixer2 = new THREE.AnimationMixer(neighbor)
@@ -359,7 +359,7 @@ gltfLoader.load(
          
         capibaraScene.scale.set(.3, .3, .3)
         capibaraScene.position.set(pos2d.x, -2118.8256403156556/3 , pos2d.y)
-        scene.add(capibaraScene)
+        unitGroup.add(capibaraScene)
  
         // Animation
         mixer = new THREE.AnimationMixer(capibaraScene)
@@ -589,6 +589,95 @@ window.addEventListener('touchend', (_event)=>
     mouseOnClick = true
 })
 
+/**
+ * Keyboard
+ *  - W: forward
+ * - S: backward
+ * - A: left
+ * - D: right
+ * - Q: up
+ * - E: down
+ * - R: reset
+ * - F: fullscreen
+ * - P: pause
+ * - M: mute
+ * - N: next
+ * - B: beacon
+ * - C: capybara
+ * - T: sun
+ * - G: ground
+ * - L: light
+ * - O: ocean
+ * - K: kapi
+ * - I: island
+ * - J: japan
+ * - H: house
+ * - Z: zoom
+ * - X: zoom out
+ * - V: zoom in
+ **/
+let keyboardMoveInput = false;
+window.addEventListener('keydown', (event)=>{
+    if(keyboardMoveInput!='wait'){
+        if (event.key === 'w'){
+            keyboardMoveInput = 'forward'
+        }
+        if (event.key === 's'){
+            keyboardMoveInput = 'backward'
+        }
+        if (event.key === 'a'){
+            keyboardMoveInput = 'left'
+        }
+        if (event.key === 'd'){
+            keyboardMoveInput = 'right'
+        }
+    }
+
+    if (event.key === 'e'){
+        camera.position.y -= 50
+    }
+    if (event.key === 'r'){
+        camera.position.set(0, 0, 0)
+        camera.rotation.set(0, 0, 0)
+    }
+    if (event.key === 'f'){
+        if (document.fullscreenElement)
+            document.exitFullscreen()
+        else
+            document.documentElement.requestFullscreen()
+    }
+    if (event.key === 'p'){
+        paused = !paused
+    }
+    if (event.key === 'm'){
+        muted = !muted
+    }
+    if (event.key === 'n'){
+        season += Math.PI / 2
+        season = season % (2 * Math.PI)
+    }
+    if (event.key === 'b'){
+        beaconHeight += 50
+    }
+    if (event.key === 'c'){
+        capybaraHeight += 50
+    }
+    if (event.key === 't'){
+        sunHeight += 50
+    }
+    if (event.key === 'g'){
+        groundHeight += 50
+    }
+    if (event.key === 'l'){
+        lightHeight += 50
+    }
+    if (event.key === 'o'){
+        oceanHeight += 50
+    }
+    if (event.key === 'k'){
+        kapiHeight += 50
+    }
+})
 
 /**
  * Camera
@@ -607,6 +696,8 @@ let kapiHouseSceneHR
 let kapiHouseSceneLR
 let distanceToHouse
 let kapiHouseClonePosition = new Vector3(0, 0, 0)
+
+let kapiMyHouse ;
 
 gltfLoader.load(
     '/architect/house_simple.glb',
@@ -631,6 +722,34 @@ gltfLoader.load(
                 }
             }
         }
+
+        //kapiMyHouse = kapiHouseSceneHR.getObjectByName('MyHouse')
+        kapiMyHouse = kapiHouseSceneHR.clone();
+        kapiMyHouse.rotateOnAxis(new Vector3(0, 1, 0), Math.PI)
+        kapiMyHouse.position.set(pos2d.x, (-2118.8256403156556 -1)/3 - 8 + 10, pos2d.y + 50)
+        //make the house transparent
+        kapiMyHouse.traverse(function(child) {
+            if (child.isMesh) {
+                child.material = child.material.clone();
+                child.material.transparent = true;
+                child.material.opacity = 0.3;
+            }
+        });
+        unitGroup.add(kapiMyHouse);
+
+        //make it visible when hold the shift key
+        kapiMyHouse.visible = false;
+        window.addEventListener('keydown', (event)=>{
+            if (event.key === 'q'){
+                kapiMyHouse.visible = !kapiMyHouse.visible;
+            }
+        })
+        // window.addEventListener('keyup', (event)=>{
+        //     if (event.key === 'q'){
+        //         kapiMyHouse.visible = false;
+        //     }
+        // }
+        // )
     } 
 )
 
@@ -682,7 +801,7 @@ renderer.shadowMap.enabled = true
 renderer.shadowMap.type = THREE.PCFSoftShadowMap
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.outputEncoding = sRGBEncoding
+//renderer.outputEncoding = sRGBEncoding
 
 /**
  * Controls
@@ -757,7 +876,7 @@ let target2d = new Vector2(0,0);
 let kapiOnRun = -1;
 const marsdayDOM = document.getElementById('marsday');
 
-let marsDays = Date.now()/1000;
+let marsDays = 0 * Date.now()/1000;
 let timespeed = 150.;
 const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
 
@@ -848,6 +967,7 @@ const tick = () =>
                 controls.target = beaconMesh.position;
                 camera.updateProjectionMatrix()
             }
+            
         }
 
         if (mouseOnClick)
@@ -864,7 +984,9 @@ const tick = () =>
                 // rotate the object to orient it to the target2d
                 const phi = Math.atan2(vel.y, vel.x);
                 if(phi){
+                    const diff = (Math.PI/2- phi) - capibaraScene.rotation.y;
                     capibaraScene.rotation.y = Math.PI/2- phi;
+                    kapiMyHouse.rotateOnAxis(new Vector3(0, 1, 0), diff);
                     socket.emit('set',{attr:'rotation', val:capibaraScene.rotation.y});
                 }
                 
@@ -889,6 +1011,61 @@ const tick = () =>
             }
         }
         mouseOnClick = false;
+
+        if (keyboardMoveInput && keyboardMoveInput!=='wait')
+        {
+            const dirvec = new THREE.Vector2(camera.position.x, camera.position.z).sub(pos2d)
+            target2d = new THREE.Vector2().copy(pos2d)
+            if(keyboardMoveInput==='forward'){
+                target2d.sub(dirvec);
+            }
+            else if(keyboardMoveInput==='backward'){
+                target2d.add(dirvec);
+            }
+            else if(keyboardMoveInput==='left'){
+                target2d.add(new THREE.Vector2(-dirvec.y, dirvec.x));
+            }
+            else if(keyboardMoveInput==='right'){
+                target2d.sub(new THREE.Vector2(-dirvec.y, dirvec.x));
+            }
+            
+            socket.emit('set',{attr:'target2d', val:{x: target2d.x, y: target2d.z}});
+            
+            vel.subVectors(target2d, pos2d).normalize().multiplyScalar(40);//144 km/h
+            
+            // rotate the object to orient it to the target2d
+            const phi = Math.atan2(vel.y, vel.x);
+            if(phi){
+                const diff = (Math.PI/2- phi) - capibaraScene.rotation.y;
+                capibaraScene.rotation.y = Math.PI/2- phi;
+                kapiMyHouse.rotateOnAxis(new Vector3(0, 1, 0), diff);
+                socket.emit('set',{attr:'rotation', val:capibaraScene.rotation.y});
+            }
+            
+            raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
+            let intersect_vertical = raycaster_far.intersectObjects(terrGroup.children , true );
+            if( intersect_vertical && intersect_vertical.length != 0){
+                //console.log("target position:")
+                //console.log(intersect_vertical[0].point)
+                spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
+                spotLight2.target.position.copy(intersect_vertical[0].point)
+                spotLight2.intensity = 2.;
+                spotLight2.target.updateMatrixWorld();
+                
+                // kapi running animation
+                console.log('kapiOnRun', kapiOnRun)
+                action.stop()
+                action = mixer.clipAction(capybaraAnimation[3])
+                action.play()
+                kapiOnRun = 2;
+                socket.emit('set',{attr:'kapiOnRun', val:kapiOnRun});
+            }
+
+            keyboardMoveInput = 'wait';
+            setTimeout(()=>{
+                keyboardMoveInput = false;
+            },800);
+        }
 
         if(kapiOnRun>0){
 
@@ -959,6 +1136,7 @@ const tick = () =>
             if( kapiOnRun > 0){
                 camera.position.add(new Vector3().subVectors(pos3d, capibaraScene.position));
                 capibaraScene.position.copy(pos3d);
+                kapiMyHouse.position.copy(pos3d).add(new Vector3(1.3*vel.x,10,1.3*vel.y));
                 beaconMesh.position.copy(pos3d).add(new THREE.Vector3(0,beaconHeight,0));
             }
             else{
