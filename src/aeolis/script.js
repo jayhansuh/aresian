@@ -8,7 +8,15 @@ const Color = require('color');
 
 const neighbors = {};
 const { io } = require("socket.io-client");
-const socket = io();
+const socket = io.connect('https://aresian.azurewebsites.net/',
+    {
+        reconnection: true,
+        transports: ['websocket'],
+        withCredentials: true,
+    }
+);
+
+//const socket = io();
 socket.on("connect", () => {
     const engine = socket.io.engine;
     console.log(engine.transport.name); // in most cases, prints "polling"
@@ -38,8 +46,8 @@ socket.on("connect", () => {
                         scene.add(neighbor)
                 
                         // Animation
-                        const mixer2 = new THREE.AnimationMixer(neighbor)
-                        const action2 = mixer2.clipAction(anim[1])
+                        let mixer2 = new THREE.AnimationMixer(neighbor)
+                        let action2 = mixer2.clipAction(anim[1])
                         action2.play()
 
                         neighbors[data.id] = {
@@ -64,7 +72,7 @@ socket.on("connect", () => {
                     neighbor.rotation.y = data.val
                 }
                 else if(data.attr=='kapiOnRun'){
-                    const { mixer, action , anim } = neighbors[data.id];
+                    let { mixer, action , anim } = neighbors[data.id];
                     action.stop()
                     action = mixer.clipAction(anim[( data.val==2 ? 3 : 1)])
                     action.play()
