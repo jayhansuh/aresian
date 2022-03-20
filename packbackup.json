@@ -1,0 +1,7 @@
+{
+    "start": "node server/server.js",
+    "start2": "cross-env NODE_ENV=production node server/server.js",
+    "build": "webpack --config ./bundler/webpack.prod.js",
+    "dev": "webpack serve --config ./bundler/webpack.dev.js",
+    "develop": "cross-env NODE_ENV=development node server/server.js"
+}
