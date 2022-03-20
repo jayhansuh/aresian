@@ -426,6 +426,26 @@ let egyptianLoaded = false
      }
  )
 
+/**
+ * Shop Model
+ */
+let shopScene;
+let shopLoaded = false
+
+ gltfLoader.load(
+     '/aeoliscity/Village/Shop_Simple.glb',
+     (gltf) =>
+     {
+         shopScene = gltf.scene
+          
+         shopScene.scale.set(1, 1, 1)
+         shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 +1.5 , pos2d.y+30)
+         shopScene.rotation.y = Math.PI/2;
+         terrGroup.add(shopScene)
+         shopLoaded = true 
+
+     }
+ )
 
 /**
  * Kapi Neighbor
