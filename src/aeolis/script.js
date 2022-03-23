@@ -3,7 +3,17 @@ import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js'
+
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
+import { isinpolygon } from '../Utils/isinpolygon'
+
+
 import { Sphere, sRGBEncoding, TextureLoader, Vector2, Vector3 } from 'three';
+
 const Color = require('color');
 
 const neighbors = {};
@@ -59,7 +69,6 @@ socket.on("connect", () => {
                         }
                     }
                 )
-                
             }
 
             neighbors[data.id][data.attr] = data.val;
@@ -714,22 +723,38 @@ let kapiHouseSceneHRLoaded = false
 let kapiHouseSceneLRLoaded = false
 let kapiHouseSceneHR
 let kapiHouseSceneLR
+let ROI_coordinate = []
+let secondFloorMaterials = []
 let distanceToHouse
 let kapiHouseClonePosition = new Vector3(0, 0, 0)
+let kapiMyHouse 
 
-let kapiMyHouse ;
 
 gltfLoader.load(
-    '/architect/house_simple.glb',
+    '/aeoliscity/Village/house_sectioned.glb',
     (gltf) =>
     {
         kapiHouseSceneHR = gltf.scene
-        kapiHouseSceneHR.position.set(pos2d.x, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50)
+        kapiHouseSceneHR.position.set(pos2d.x - 30, (-2118.8256403156556 -1)/3 - 5 , pos2d.y + 10)
         kapiHouseSceneHR.rotateOnAxis(new Vector3(1, 0, 0), - 0.04)
         kapiHouseSceneHR.rotateOnAxis(new Vector3(0, 1, 0), Math.PI)
         kapiHouseSceneHR.castShadow = true
         kapiHouseSceneHR.receiveShadow = true
         kapiHouseSceneHRLoaded = true
+        terrGroup.add(kapiHouseSceneHR)
+        
+        // Pile position for remove the walls
+        let pilePosition = new THREE.Vector3()
+
+        kapiHouseSceneHR.traverse(function(child){
+            if (child.name.slice(0, 4) == "pile"){
+                ROI_coordinate.push([child.getWorldPosition(pilePosition).x, child.getWorldPosition(pilePosition).z])
+            }
+            if (child.name.slice(0,2) == "2f"){
+                child.material = child.material.clone();
+                secondFloorMaterials.push(child)
+            }
+        });
 
         for(let i = -20; i < 20; i++){
             for (let j = 0; j < 20; j++){
@@ -737,11 +762,16 @@ gltfLoader.load(
                 distanceToHouse = camera.position.clone().distanceTo(kapiHouseClonePosition) 
                 if (distanceToHouse < 300){
                     let kapiHouseHRClone = kapiHouseSceneHR.clone()
+                    kapiHouseHRClone.traverse(function(child){
+                        if (child.isMesh) {
+                        child.material = child.material.clone()
+                        }
+                    })
                     kapiHouseHRClone.position.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
                     terrGroup.add(kapiHouseHRClone)
                 }
             }
-        }
+        }  
 
         //kapiMyHouse = kapiHouseSceneHR.getObjectByName('MyHouse')
         kapiMyHouse = kapiHouseSceneHR.clone();
@@ -778,7 +808,7 @@ gltfLoader.load(
  */
 
 gltfLoader.load(
-    '/architect/house_simple_lr.glb',
+    '/aeoliscity/Village/House_Simple_LR.glb',
     (gltf) =>
     {
         kapiHouseSceneLR = gltf.scene
@@ -807,8 +837,6 @@ gltfLoader.load(
 // if (kapiHouseSceneHRLoaded && kapiHouseSceneLRLoaded){
 //     change the object HR to LR or LR to HR based on the distance from the camera to each object
 // }
-
-
 
 /**
  * Renderer
@@ -853,7 +881,6 @@ controls.maxDistance = 120;
 /**
  * Background & Fog Colors debug GUI
  */
-
 // Background 
 let backgroundColor = Color.hsl(216, 6, 15)
 //debugObject.backgroundColor = backgroundColor.hex()//"#B89B95"
@@ -901,6 +928,35 @@ let timespeed = 150.;
 const marsYearInmarsDay = 687 * 24 / ( 24 + 37 / 60);
 
 let reportTime = 0;
+
+/**
+ * Outline and Post Processing
+ */
+// let effectFXAA
+// let selectedObjects = [];
+// let composer = new EffectComposer( renderer );
+// let renderPass = new RenderPass( scene, camera );
+// composer.addPass( renderPass );
+// let outlinePass = new OutlinePass( new THREE.Vector2( window.innerWidth, window.innerHeight ), scene, camera );
+// outlinePass.edgeStrength = 8.0
+// outlinePass.edgeThickness = 10.0
+// renderPass.renderToScreen = true
+// outlinePass.renderToScreen = true
+
+// outlinePass.visibleEdgeColor.set('#ffffff');
+// outlinePass.hiddenEdgeColor.set('#190a05');
+// composer.addPass( outlinePass );
+
+// effectFXAA = new ShaderPass( FXAAShader );
+// effectFXAA.uniforms[ 'resolution' ].value.set( 1 / window.innerWidth, 1 / window.innerHeight );
+// composer.addPass( effectFXAA );
+
+// function addSelectedObject( object ) {
+
+//     selectedObjects = [];
+//     selectedObjects.push( object );
+
+// }
 
 const tick = () =>
 {
@@ -956,7 +1012,8 @@ const tick = () =>
         sundir.applyAxisAngle( new Vector3(1,0,0), - lat );
         directionalLight.position.copy(sundir);
         const sunind = sundir.dot(new Vector3(0,1,0));
-        timespeed = sunind > 0 ? 300 : 900;
+        timespeed = 0
+        //timespeed = sunind > 0 ? 300 : 900;
         sunMesh.position.copy(sundir.multiplyScalar(sunDistance));
         directionalLight.intensity = ( sunind > 0.2 ? 0.6 : (sunind < -0.2 ? 0 : 0.3+ 0.6/0.4 * sunind));
         const suhem = [ 0.82 , 0.3, 0.];
@@ -990,6 +1047,34 @@ const tick = () =>
             
         }
 
+
+        //raycaster_far.setFromCamera(mouse, camera)
+        //let intersect = raycaster_far.intersectObjects(terrGroup.children, true )
+        // if(intersect && intersect.length > 0){
+        //     if(intersect[0].object.name == "balcony_top001"){
+        //         const selectedObject = intersect[0].object
+        //         addSelectedObject( selectedObject );
+        //         outlinePass.selectedObjects = selectedObjects
+        //         console.log(outlinePass)
+        //     }else{
+        //     }
+        // }
+
+        // if the target position is in the house/is in polygon then invisible the room
+        if(isinpolygon([capibaraScene.position.x, capibaraScene.position.z], ROI_coordinate)){
+            //console.log('isinpolygon')
+            for (let i in secondFloorMaterials){
+                secondFloorMaterials[i].material.visible = false
+            }
+        }else{
+            //console.log('isnot in polygon')
+            for (let i in secondFloorMaterials){
+                secondFloorMaterials[i].material.visible = true
+            }
+        }
+
+
+
         if (mouseOnClick)
         {
             raycaster_far.setFromCamera(mouse, camera);
@@ -1009,12 +1094,12 @@ const tick = () =>
                     kapiMyHouse.rotateOnAxis(new Vector3(0, 1, 0), diff);
                     socket.emit('set',{attr:'rotation', val:capibaraScene.rotation.y});
                 }
-                
+
                 raycaster_far.set(new THREE.Vector3(target2d.x, maxHeight , target2d.y), new THREE.Vector3(0,-1,0))
                 let intersect_vertical = raycaster_far.intersectObjects(terrGroup.children , true );
                 if( intersect_vertical && intersect_vertical.length != 0){
-                    //console.log("target position:")
-                    //console.log(intersect_vertical[0].point)
+                    console.log("target position:")
+                    console.log(intersect_vertical[0].point)
                     spotLight2.position.set(intersect_vertical[0].point.x, intersect_vertical[0].point.y+beaconHeight, intersect_vertical[0].point.z)
                     spotLight2.target.position.copy(intersect_vertical[0].point)
                     spotLight2.intensity = 2.;
