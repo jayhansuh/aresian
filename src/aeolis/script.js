@@ -435,6 +435,17 @@ let egyptianLoaded = false
      }
  )
 
+ gltfLoader.load(
+    '/aeoliscity/Temple/Temple_Library.glb',
+    (gltf) =>
+    {
+        let TempleLibraryScene = gltf.scene
+        TempleLibraryScene.position.set(pos2d.x - 300, (-2118.8256403156556 -1)/3 + 3, pos2d.y + 700)
+        //TempleLibraryScene.position.set(pos2d.x, -2118.8256403156556/3 , pos2d.y)
+        terrGroup.add(TempleLibraryScene)
+    }
+)
+
 /**
  * Shop Model
  */
