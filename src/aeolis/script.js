@@ -446,6 +446,18 @@ let egyptianLoaded = false
     }
 )
 
+gltfLoader.load(
+    '/aeoliscity/Temple/Temple_Museum.glb',
+    (gltf) =>
+    {
+        let TempleMuseumScene = gltf.scene
+        TempleMuseumScene.position.set(pos2d.x + 1000, (-2118.8256403156556 -1)/3 , pos2d.y + 1000)
+        TempleMuseumScene.rotation.y = -Math.PI/2;
+        terrGroup.add(TempleMuseumScene)
+    }
+)
+
+
 /**
  * Shop Model
  */
