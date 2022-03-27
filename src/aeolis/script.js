@@ -411,7 +411,7 @@ let egyptianLoaded = false
         egLight1.target.position.copy(egLight1.position).add(new Vector3(0, -2000, 0))
         egLight1.target.updateMatrixWorld();
 
-        scene.add( egLight1 );
+        //scene.add( egLight1 );
 
 
         let egLight2 = new THREE.SpotLight( 0xffffff, 2. );
@@ -431,7 +431,7 @@ let egyptianLoaded = false
         egLight2.target.position.copy(egLight1.position).add(new Vector3(0, 120, 700))
         egLight2.target.updateMatrixWorld();
 
-        scene.add( egLight2 );
+        //scene.add( egLight2 );
      }
  )
 
@@ -440,11 +440,33 @@ let egyptianLoaded = false
     (gltf) =>
     {
         let TempleLibraryScene = gltf.scene
-        TempleLibraryScene.position.set(pos2d.x - 300, (-2118.8256403156556 -1)/3 + 3, pos2d.y + 700)
-        //TempleLibraryScene.position.set(pos2d.x, -2118.8256403156556/3 , pos2d.y)
+        TempleLibraryScene.position.set(pos2d.x - 500, (-2118.8256403156556 -1)/3 + 3, pos2d.y + 700)
         terrGroup.add(TempleLibraryScene)
     }
 )
+
+gltfLoader.load(
+    '/aeoliscity/Temple/Temple_Museum.glb',
+    (gltf) =>
+    {
+        let TempleMuseumScene = gltf.scene
+        TempleMuseumScene.position.set(pos2d.x + 1500, (-2118.8256403156556 -1)/3 - 15 , pos2d.y + 1000)
+        TempleMuseumScene.rotation.y = -Math.PI/2;
+        terrGroup.add(TempleMuseumScene)
+    }
+)
+
+gltfLoader.load(
+    '/aeoliscity/Temple/Temple_Pyramid.glb',
+    (gltf) =>
+    {
+        let TemplePyramidScene = gltf.scene
+        TemplePyramidScene.position.set(pos2d.x + 12000, (-2118.8256403156556 -1)/3 , pos2d.y - 8000)
+        TemplePyramidScene.rotation.y = -Math.PI
+        terrGroup.add(TemplePyramidScene)
+    }
+)
+
 
 /**
  * Shop Model
