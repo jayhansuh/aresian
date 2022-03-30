@@ -472,8 +472,9 @@ gltfLoader.load(
     (gltf) =>
     {
         let TemplePyramidScene = gltf.scene
+        console.log(TemplePyramidScene)
         TemplePyramidScene.position.set(pos2d.x + 12000, (-2118.8256403156556 -1)/3 , pos2d.y - 8000)
-        TemplePyramidScene.rotation.y = -Math.PI
+        TemplePyramidScene.rotation.y = - Math.PI 
         materialClone(TemplePyramidScene)
         terrGroup.add(TemplePyramidScene)
     }
@@ -637,6 +638,8 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    //renderer.localClippingEnabled =true
+    console.log(renderer)
 })
 
 /**
@@ -785,7 +788,7 @@ window.addEventListener('keyup', (event)=>{
  * Camera
  */
 // Base camera 
-const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 0.1, 110 * 1000)
+const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 10, 110 * 1000)
 scene.add(camera)
 
 
@@ -1126,7 +1129,7 @@ const tick = () =>
                 if(intersectEl.distance < 0.8 * beaconCamDistance){
                         intersectEl.object.material.transparent = true;
                     if(intersectEl.object.material.opacity > 0.5){
-                        console.log(intersectEl.object.name)
+                        //console.log(intersectEl.object.name)
                         intersectEl.object.material.opacity = 0.1;
                         intersectEl.object.material.needsUpdate = true;
                         window.setTimeout(()=>{
@@ -1208,7 +1211,7 @@ const tick = () =>
                 
                 // kapi running animation
                 if(kapiOnRun!=2){
-                    console.log('kapiOnRun', kapiOnRun)
+                    //console.log('kapiOnRun', kapiOnRun)
                     action.stop()
                     action = mixer.clipAction(capybaraAnimation[3])
                     action.play()
@@ -1232,12 +1235,12 @@ const tick = () =>
             raycaster.set(new THREE.Vector3(pos2d.x, capibaraScene.position.y+ jmpthr , pos2d.y), new THREE.Vector3(0,-1,0))
             let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
             if( pos2d.dot(vel) > target2d.dot(vel)){
-                console.log('kapi arrived')
+                //console.log('kapi arrived')
                 kapiOnRun = 0;
             }
             else if(!intersect_vertical || intersect_vertical.length == 0){
                 kapiOnRun = -1;
-                console.log('kapi can not reach target')
+                //console.log('kapi can not reach target')
             }
             
             // check slope
@@ -1265,7 +1268,7 @@ const tick = () =>
                 const travelDist = capibaraScene.position.distanceTo(pos3d);
                 let intersect_view = raycaster.intersectObjects( terrGroup.children, true );
                 if( intersect_view && intersect_view.length != 0 && intersect_view[0].distance < travelDist + jmpthr/2){
-                    console.log("collision with wall")
+                    //console.log("collision with wall")
                     kapiOnRun = -1;
                 }
             }
