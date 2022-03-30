@@ -637,7 +637,7 @@ window.addEventListener('resize', () =>
 
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 4))
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     //renderer.localClippingEnabled =true
     console.log(renderer)
 })
