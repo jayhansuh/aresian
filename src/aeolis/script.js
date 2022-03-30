@@ -377,6 +377,13 @@ gltfLoader.load(
     }
 )
 
+function materialClone (gltfmodel){
+    gltfmodel.traverse(function(child){
+        if (child.isMesh) {
+        child.material = child.material.clone()
+    }})
+}
+
 /**
  * Egyptian Test Model
  */
@@ -387,12 +394,14 @@ let egyptianLoaded = false
      '/aeoliscity/Temple/Temple_Administrator.glb',
      (gltf) =>
      {
-         egyptianScene = gltf.scene
+        egyptianScene = gltf.scene
           
-         egyptianScene.scale.set(.3, .3, .3)
-         egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
-         terrGroup.add(egyptianScene)
-         egyptianLoaded = true 
+        egyptianScene.scale.set(.3, .3, .3)
+        egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
+        terrGroup.add(egyptianScene)
+        egyptianLoaded = true 
+
+        materialClone(egyptianScene)
 
         let egLight1 = new THREE.SpotLight( 0xffffff, 1.7 );
          egLight1.angle = Math.PI/10;
@@ -441,6 +450,7 @@ let egyptianLoaded = false
     {
         let TempleLibraryScene = gltf.scene
         TempleLibraryScene.position.set(pos2d.x - 500, (-2118.8256403156556 -1)/3 + 3, pos2d.y + 700)
+        materialClone(TempleLibraryScene)
         terrGroup.add(TempleLibraryScene)
     }
 )
@@ -452,6 +462,7 @@ gltfLoader.load(
         let TempleMuseumScene = gltf.scene
         TempleMuseumScene.position.set(pos2d.x + 1500, (-2118.8256403156556 -1)/3 - 15 , pos2d.y + 1000)
         TempleMuseumScene.rotation.y = -Math.PI/2;
+        materialClone(TempleMuseumScene)
         terrGroup.add(TempleMuseumScene)
     }
 )
@@ -463,6 +474,7 @@ gltfLoader.load(
         let TemplePyramidScene = gltf.scene
         TemplePyramidScene.position.set(pos2d.x + 12000, (-2118.8256403156556 -1)/3 , pos2d.y - 8000)
         TemplePyramidScene.rotation.y = -Math.PI
+        materialClone(TemplePyramidScene)
         terrGroup.add(TemplePyramidScene)
     }
 )
@@ -478,13 +490,13 @@ let shopLoaded = false
      '/aeoliscity/Village/Shop_Simple.glb',
      (gltf) =>
      {
-         shopScene = gltf.scene
-          
-         shopScene.scale.set(1, 1, 1)
-         shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 +1.5 , pos2d.y+30)
-         shopScene.rotation.y = Math.PI/2;
-         terrGroup.add(shopScene)
-         shopLoaded = true 
+        shopScene = gltf.scene
+        materialClone(shopScene)
+        shopScene.scale.set(2, 2, 2)
+        shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 - 3.5 , pos2d.y+30)
+        shopScene.rotation.y = Math.PI/2;
+        terrGroup.add(shopScene)
+        shopLoaded = true 
 
      }
  )
@@ -823,11 +835,7 @@ gltfLoader.load(
                 distanceToHouse = camera.position.clone().distanceTo(kapiHouseClonePosition) 
                 if (distanceToHouse < 300){
                     let kapiHouseHRClone = kapiHouseSceneHR.clone()
-                    kapiHouseHRClone.traverse(function(child){
-                        if (child.isMesh) {
-                        child.material = child.material.clone()
-                        }
-                    })
+                    materialClone(kapiHouseHRClone)
                     kapiHouseHRClone.position.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
                     terrGroup.add(kapiHouseHRClone)
                 }
@@ -1115,7 +1123,7 @@ const tick = () =>
         if(intersect && intersect.length > 0){
             intersect.forEach( (intersectEl) => {
                 //if(intersectEl.distance < 0.9*camera.position.distanceTo(capibaraScene.position)){
-                if(intersectEl.distance < 0.8* beaconCamDistance){
+                if(intersectEl.distance < 0.8 * beaconCamDistance){
                         intersectEl.object.material.transparent = true;
                     if(intersectEl.object.material.opacity > 0.5){
                         console.log(intersectEl.object.name)
