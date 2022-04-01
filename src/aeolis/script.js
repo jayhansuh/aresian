@@ -788,7 +788,7 @@ window.addEventListener('keyup', (event)=>{
  * Camera
  */
 // Base camera 
-const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 10, 110 * 1000)
+const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 1, 110 * 1000)
 scene.add(camera)
 
 
@@ -807,7 +807,7 @@ let kapiMyHouse
 
 
 gltfLoader.load(
-    '/aeoliscity/Village/house_sectioned.glb',
+    '/aeoliscity/Village/house_simple.glb',
     (gltf) =>
     {
         kapiHouseSceneHR = gltf.scene
@@ -817,21 +817,7 @@ gltfLoader.load(
         kapiHouseSceneHR.castShadow = true
         kapiHouseSceneHR.receiveShadow = true
         kapiHouseSceneHRLoaded = true
-        terrGroup.add(kapiHouseSceneHR)
         
-        // Pile position for remove the walls
-        let pilePosition = new THREE.Vector3()
-
-        kapiHouseSceneHR.traverse(function(child){
-            if (child.name.slice(0, 4) == "pile"){
-                ROI_coordinate.push([child.getWorldPosition(pilePosition).x, child.getWorldPosition(pilePosition).z])
-            }
-            if (child.name.slice(0,2) == "2f"){
-                child.material = child.material.clone();
-                secondFloorMaterials.push(child)
-            }
-        });
-
         for(let i = -20; i < 20; i++){
             for (let j = 0; j < 20; j++){
                 kapiHouseClonePosition.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
@@ -1123,14 +1109,15 @@ const tick = () =>
         //raycaster_far.setFromCamera(new Vector2(0,0), camera)
         raycaster_far.set(camera.position, new THREE.Vector3().copy(capibaraScene.position).sub(camera.position).normalize())
         let intersect = raycaster_far.intersectObjects(terrGroup.children, true )
+        //console.log(capibaraScene.position.distanceTo(camera.position))
         if(intersect && intersect.length > 0){
             intersect.forEach( (intersectEl) => {
-                //if(intersectEl.distance < 0.9*camera.position.distanceTo(capibaraScene.position)){
-                if(intersectEl.distance < 0.8 * beaconCamDistance){
+                //if(intersectEl.distance < 0.99 *capibaraScene.position.distanceTo(camera.position)){
+                if(intersectEl.distance <  beaconCamDistance ){
                         intersectEl.object.material.transparent = true;
                     if(intersectEl.object.material.opacity > 0.5){
                         //console.log(intersectEl.object.name)
-                        intersectEl.object.material.opacity = 0.1;
+                        intersectEl.object.material.opacity = 0.2;
                         intersectEl.object.material.needsUpdate = true;
                         window.setTimeout(()=>{
                             intersectEl.object.material.opacity = 1;
@@ -1140,19 +1127,7 @@ const tick = () =>
                 }
             })
         }
-
-        // if the target position is in the house/is in polygon then invisible the room
-        if(isinpolygon([capibaraScene.position.x, capibaraScene.position.z], ROI_coordinate)){
-            //console.log('isinpolygon')
-            for (let i in secondFloorMaterials){
-                secondFloorMaterials[i].material.visible = false
-            }
-        }else{
-            //console.log('isnot in polygon')
-            for (let i in secondFloorMaterials){
-                secondFloorMaterials[i].material.visible = true
-            }
-        }
+        
 
 
         let newTarget2D = false;
