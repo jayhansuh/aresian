@@ -1117,7 +1117,7 @@ const tick = () =>
                         intersectEl.object.material.transparent = true;
                     if(intersectEl.object.material.opacity > 0.5){
                         //console.log(intersectEl.object.name)
-                        intersectEl.object.material.opacity = 0.2;
+                        intersectEl.object.material.opacity = 0.15;
                         intersectEl.object.material.needsUpdate = true;
                         window.setTimeout(()=>{
                             intersectEl.object.material.opacity = 1;
