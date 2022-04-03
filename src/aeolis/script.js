@@ -449,7 +449,7 @@ let egyptianLoaded = false
     (gltf) =>
     {
         let TempleLibraryScene = gltf.scene
-        TempleLibraryScene.position.set(pos2d.x - 500, (-2118.8256403156556 -1)/3 + 3, pos2d.y + 700)
+        TempleLibraryScene.position.set(pos2d.x - 500, (-2118.8256403156556 -1)/3 - 1, pos2d.y + 700)
         materialClone(TempleLibraryScene)
         terrGroup.add(TempleLibraryScene)
     }
