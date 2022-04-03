@@ -493,11 +493,18 @@ let shopLoaded = false
      {
         shopScene = gltf.scene
         materialClone(shopScene)
-        shopScene.scale.set(2, 2, 2)
-        shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 - 3.5 , pos2d.y+30)
+        shopScene.scale.set(2.5, 2.5, 2.5)
+        shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 - 3.5 , pos2d.y + 40)
         shopScene.rotation.y = Math.PI/2;
         terrGroup.add(shopScene)
         shopLoaded = true 
+
+        let shopScene1 = shopScene.clone()
+        materialClone(shopScene1)
+        shopScene1.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 + 0.5 , pos2d.y + 160)
+        terrGroup.add(shopScene1)
+
+        
 
      }
  )
