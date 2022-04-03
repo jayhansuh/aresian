@@ -509,6 +509,35 @@ let shopLoaded = false
      }
  )
 
+ let VillageRoadScene
+ gltfLoader.load(
+    '/aeoliscity/Village/Village_Road.glb',
+    (gltf) =>
+    {
+       VillageRoadScene = gltf.scene
+       materialClone(VillageRoadScene)
+       VillageRoadScene.scale.set(1, 1, 1)
+       VillageRoadScene.position.set(pos2d.x+ 200, (-2118.8256403156556 -1)/3 + 0.5 , pos2d.y + 10)
+       VillageRoadScene.rotation.y = Math.PI/2;
+
+       for(let i = 5; i < 13; i++){
+            VillageRoadScene = VillageRoadScene.clone()
+            VillageRoadScene.position.set(pos2d.x+ 240, (-2118.8256403156556 -1)/3 -1 +1.5*i , pos2d.y -4 + i * 40)
+            terrGroup.add(VillageRoadScene)
+        }
+     
+
+
+    //    let shopScene1 = shopScene.clone()
+    //    materialClone(shopScene1)
+    //    shopScene1.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 + 0.5 , pos2d.y + 160)
+    //    terrGroup.add(shopScene1)
+
+       
+
+    }
+)
+
 /**
  * Kapi Neighbor
  */
