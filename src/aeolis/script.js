@@ -565,6 +565,21 @@ let capibaraScene2
     }
 )
 
+let mixer3 = null
+gltfLoader.load(
+    '/aeoliscity/Animals/Animals_Chicken.glb',
+    (gltf) =>
+    {
+        let chickenScene = gltf.scene
+        let chickenAnimation = gltf.animations
+        chickenScene.position.set(pos2d.x - 3, -2118.8256403156556/3 - 0.3 , pos2d.y - 27)
+        unitGroup.add(chickenScene)
+        console.log(gltf.animations)
+        mixer3 = new THREE.AnimationMixer(chickenScene)
+        let action3 = mixer3.clipAction(chickenAnimation[0])
+        action3.play()
+    }
+)
 
 /**
  * Beacon
@@ -1334,6 +1349,10 @@ const tick = () =>
     if(mixer2)
     {
         mixer2.update(deltaTime)
+    }
+    if(mixer3)
+    {
+        mixer3.update(deltaTime)
     }
 
     // Render
