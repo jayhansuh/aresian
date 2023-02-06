@@ -11,8 +11,11 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { isinpolygon } from '../Utils/isinpolygon'
 
-
 import { Sphere, sRGBEncoding, TextureLoader, Vector2, Vector3 } from 'three';
+
+import { generateName } from '../script/playerAuth'
+
+console.log(generateName());
 
 const Color = require('color');
 
