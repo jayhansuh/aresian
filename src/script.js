@@ -351,6 +351,20 @@ document.addEventListener('keydown', (event) => {
 
 document.getElementById('bgmusic').volume = 0.1;
 document.addEventListener('mouseover', function() { document.getElementById('bgmusic').play();}, { once: true });
+// Button sound play when button onclick event
+document.getElementById('button_sound').volume = 0.5;
+function playButtonSound(){
+    document.getElementById('button_sound').play();
+}
+document.querySelector('.marbutton').addEventListener('click', playButtonSound);
+document.querySelector('.button-bar').addEventListener('click', playButtonSound);
+document.querySelector('.button-right-top').addEventListener('click', playButtonSound);
+document.querySelector('.label').addEventListener('click', playButtonSound);
+
+//When document is clicked console log what is clicked
+// document.addEventListener('click', function(event) {
+//     console.log(event.target);
+// });
 
 // on off setting page
 function settingOnOff(){
