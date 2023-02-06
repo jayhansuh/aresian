@@ -14,13 +14,37 @@
 
 </head>
 <body>
+
+    <!-- Loading bar start -->
+    <div class="loading-bar">
+        <div class="loading-bar__inner">
+            <span class="loading-bar__text">Loading</span>
+        </div>
+    </div>
+    <script type="text/javascript">
+        //loading bar dot animation
+        var dots = window.setInterval( function() {
+            var wait = document.querySelector(".loading-bar__text");
+            if ( wait.innerHTML.length > 9 ) 
+                wait.innerHTML = "Loading";
+            else 
+                wait.innerHTML += ".";
+        }, 300);
+        //loading bar display none when loaded
+        window.addEventListener('load', function () {
+            var loading = document.querySelector('.loading-bar');
+            loading.style.display = 'none';
+            clearInterval(dots);
+        });
+    </script>
+    <!-- Loading bar end -->
+
     <audio id="bgmusic" ref="player" volume="0.1">
         <source src="./music/angelic_circles.mp3" type="audio/mp3">
     </audio>
     
     <canvas class="webgl"></canvas>
-    <div class="loading-bar"></div>
-
+    
     <div style="color:gray">
         <div class="button-right-top" onclick="window.settingOnOff()">
             <span class="material-icons">settings</span>
@@ -54,16 +78,20 @@
 
     
 
-    <div class="navbar">
+    <div class="navbar aeolis">
         <!-- esacpe button -->
-        <div class="button-right-top" onclick="window.navOnOff();">
+        <div class="button-right-top" onclick="window.navOnOff('off');">
             <span class="material-icons">close</span>
         </div>
 
         <!-- sample image div -->
         <div class="navbar-item">
             <div class="navbar-item-image">
-                <img src="./img/Topographic_Map_of_Gale_Crater.jpg.webp" alt="sample image">
+                <!-- Make a href link to open in a new tab -->
+
+                <a target="_blank" rel="noopener noreferrer" href="https://en.wikipedia.org/wiki/Aeolis_Palus">
+                    <img src="./img/Topographic_Map_of_Gale_Crater.jpg.webp" alt="sample image">
+                </a>
             </div>
         </div>
         <div class=navbar-item>
@@ -78,14 +106,43 @@
                     </span>
                 </button>
             </div>
-            <div>
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quidem expedita debitis quia perspiciatis nihil rerum qui ut repellendus, aliquam, voluptatem numquam corrupti asperiores corporis neque doloremque distinctio quod repudiandae quisquam.
+            <div style="font-family:monospace;line-height:1.8;font-size: 12pt;">
+               <span>&ensp;Aeolis city, located in the Aeolis Palus region on Mars, is a real and vibrant city that invites Earth players to take a physical journey to the heart of the Red Planet. As the birthplace of the historic NASA Curiosity Rover landing, Aeolis city boasts a rich history and diverse geography that awaits your discovery. From the winding valleys to the towering mountain ranges, the Martian landscape offers a unique and captivating environment for players to explore. With landmarks like the Curiosity Rover landing site, Aeolis city is a testament to humanity's relentless pursuit of knowledge and discovery. This city is not just a virtual representation, but a real place waiting for you to visit and experience its beauty and mystery first hand. So pack your bags, grab your spacesuit, and prepare to embark on an unforgettable adventure to Aeolis city, the vibrant heart of Mars!</span>
             </div>    
+        </div>
+    </div>
+
+    <div class="navbar unknown">
+        <!-- esacpe button -->
+        <div class="button-right-top" onclick="window.navOnOff('off');">
+            <span class="material-icons">close</span>
+        </div>
+
+        <div class="navbar-item" style="width:100%;" >
+            <div class="properText" style="display:flex;justify-content: center;">Unknwon</div>
+            <div class="button-bar" style="width:50%;">
+                <button class="marbutton" onClick="">
+                    <!-- material icons for construction site -->
+                    <span class="material-icons" style="align-self: center;margin: 0 5px 0 0;">
+                        construction
+                    </span>
+                    <span class="marbutton__label">
+                        UNDER CONSTRUCTION
+                    </span>
+                </button>
+            </div>
+            <div style="font-family:monospace;line-height:1.8;font-size: 12pt;align-self: center;max-width:960px;">
+                <!-- Will be serviced in the future -->
+                <p>	&nbsp;</p>
+                <p>&ensp;In the future, our development team is working hard to bring you more exciting and unique virtual cities on Mars. Each of these cities will provide players with a unique experience, showcasing the diversity and complexity of the Red Planet.</p>
+                <p>&ensp;<span class="properText small">Planitia</span>: This city is located in the vast, low-lying plain of Utopia Planitia, known for its wide-open spaces and gently rolling terrain. In Utopia Planitia, players can experience the beauty of Mars' broad vistas, dotted with towering craters and fascinating geological formations.</p>
+                <p>&ensp;<span class="properText small">Valles Marineris</span>: This city is located in the heart of Valles Marineris, one of the largest and most impressive canyons in the solar system. Players will be able to explore the towering cliffs, deep valleys, and complex networks of channels that make Valles Marineris one of the most scientifically significant regions on Mars.</p>
+                <p>&ensp;<span class="properText small">Olympus Mons</span>: This city is located at the base of Olympus Mons, the tallest mountain in the solar system. Players will be able to explore the dramatic and rugged terrain at the base of this towering peak, and learn about the geological processes that have shaped the Martian surface over billions of years.</p>
+                <p>&ensp;<span class="properText small">Argyre Planitia</span>: This city is located in the vast, low-lying plain of Argyre Planitia, known for its wide-open spaces and gently rolling terrain. In Argyre Planitia, players can experience the beauty of Mars' broad vistas, dotted with towering craters and fascinating geological formations.</p>
+                <p>	&nbsp;</p>
+
+                <p>&ensp;These virtual cities on Mars are only the beginning of what our development team has in store. We hope to bring you more unique and scientifically rich virtual destinations in the future, as we explore the mysteries and beauty of the Red Planet together.</p>
+            </div>
         </div>
     </div>
 </body>

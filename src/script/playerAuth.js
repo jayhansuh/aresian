@@ -54,9 +54,11 @@ else{
 // hello to player by popup window
 function helloPlayer() {
     var hello = document.getElementById("hello");
-    hello.innerHTML = "<span>Hello, " + username + "!</span>"
+    // Close material icon button
+    hello.innerHTML = "<span>Hello, " + username + "! \t </span>"
     hello.innerHTML += "<span>You are player " + player_id + ".</span>"
     hello.innerHTML += "<span>If you want to change your username, please click on the button below.</span>";
+    hello.innerHTML += "<div style='margin-top:5px;display:flex;justify-content:space-around;'> <button class='close' onclick='popupDisappear()' style='color:black;'>X</button></div>";
 }
 helloPlayer();
 //window.localStorage.setItem('playerAuth', '{"username":"admin","password":"admin"}');

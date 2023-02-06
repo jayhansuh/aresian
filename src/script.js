@@ -17,16 +17,18 @@ import{ PMREMGenerator } from 'three/src/extras/PMREMGenerator.js'
 console.log('%cWELCOME ARESIAN', 'font-size: 50px; color: #fff; background: #000; padding: 10px;');
 //console.log(process.env.NODE_ENV);
 
-// Entry title
-const title = document.createElement('div');
-title.className = 'entrytitle properText';
-title.innerHTML = '<div>ARESIAN</div>';
-document.body.appendChild(title);
-window.setTimeout(() => {document.querySelector('div.entrytitle').remove();},4000);
-
 window.var={};
 window.eventListners = {};
 
+// Wait for the window to load
+window.addEventListener('load', () => {
+    // Entry title
+    const title = document.createElement('div');
+    title.className = 'entrytitle properText';
+    title.innerHTML = '<div>ARESIAN</div>';
+    document.body.appendChild(title);
+    window.setTimeout(() => {document.querySelector('div.entrytitle').remove();},4000);
+}); 
 
 // texture files
 const marsTextureFiles = {
@@ -145,10 +147,32 @@ const pointContainer = document.createElement("div");
 pointContainer.className="pointContainer";
 
 // return onclick function to make navbar visible
-function navOnOff(){
-    const nav = document.querySelector('.navbar');
-    nav.classList.toggle('visible');
-    document.body.classList.toggle('grabbable');
+function navOnOff(tag){
+
+    // if navbar is visible, make it invisible
+    const nav = document.querySelector('.navbar.visible');
+    if(nav){
+        nav.classList.remove('visible');
+        document.body.classList.toggle('grabbable');
+        return;
+    }
+
+    if(tag!='off'){
+        if(this.id=="Aeolis Palus (Curisosity,2012)"){
+            const nav = document.querySelector('.navbar.aeolis');
+            nav.classList.toggle('visible');
+            document.body.classList.toggle('grabbable');
+        }
+        else{
+            const nav = document.querySelector('.navbar.unknown');
+            nav.classList.toggle('visible');
+            document.body.classList.toggle('grabbable');
+            
+            const navTitle = document.querySelector('.navbar.unknown .properText');
+            navTitle.innerHTML = `<div>${this.id}</div>`;
+        }
+    }
+    
 }
 window.navOnOff=navOnOff;
 
@@ -157,6 +181,8 @@ const points = fl.map((d,i)=>{
     // Create point
     const pointDiv = document.createElement("div");
     pointDiv.className = `point point-${i}`;
+    //Set pointDiv id to the name of the point
+    pointDiv.id = d.name;
     pointDiv.onclick = navOnOff;
 
     // Create circled number
@@ -319,9 +345,7 @@ tick()
 // escape key to navbar not visible
 document.addEventListener('keydown', (event) => {
     if(event.key === 'Escape') {
-        const nav = document.querySelector('.navbar');
-        nav.classList.remove('visible');
-        document.body.classList.toggle('grabbable');
+        navOnOff('off');
     }
 });
 
