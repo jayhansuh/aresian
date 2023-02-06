@@ -62,9 +62,8 @@ helloPlayer();
 //window.localStorage.setItem('playerAuth', '{"username":"admin","password":"admin"}');
 
 // hello div onclick function to disappear
-function helloDisappear() {
-    var hello = document.getElementById("hello");
-    hello.style.display = "none";
+function popupDisappear() {
+    var popupDiv = document.getElementById("popupDiv");
+    popupDiv.style.display = "none";
 }
-//helloDisappear();
-window.helloDisappear = helloDisappear;
+window.popupDisappear = popupDisappear;
