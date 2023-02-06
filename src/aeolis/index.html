@@ -72,7 +72,10 @@
 
     <div id="touchDiv" style="position: absolute;width:100%;height:100%;z-index: -1;">a</div>
     <canvas class="webgl"></canvas>
-
+    
+    <!-- Dummy input field -->
+    <input type="text" id="dummy" style="position: absolute;top: -100vh;">
+    <!-- <div class="loading-bar"></div> -->
 
     <!-- This div prevent double click highlights-->
     <div style="margin-top: -10px;height:10px;opacity:0;">a</div>
@@ -127,12 +130,11 @@
 
     </div>
 
-
-   
-
-    
-    
-    
+    <!-- initial popup div-->
+    <div style="position:absolute;top:0;left:0;width:100vw;height:100vh;display:flex;justify-content: center;">
+        <div onclick="helloDisappear()" id="hello" style="display: flex; flex-direction: column; margin:20px; padding: 20px; border-radius: 10px; background: #fbfbfb80; height:fit-content; font-weight: bold; color: black;">
+        </div>
+    </div>
 
 </body>
 </html>
