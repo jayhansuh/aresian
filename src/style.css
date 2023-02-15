@@ -51,6 +51,13 @@ img{
     width: 100%;
     height: 100%;
     border-radius: 12px;
+    border: 3px solid var(--darkmartian-trpt);
+    transition: all 0.3s;
+}
+
+img:hover{
+    border: 3px solid var(--martian);
+    color: var(--lightmartian);
 }
 
 .webgl
@@ -123,6 +130,12 @@ img{
     font-weight: 100;
 }
 
+.properText.small
+{
+    font-size: 24pt;
+    color : orange;
+}
+
 .entrytitle {
     position: absolute;
     top: 50vh;
@@ -164,7 +177,8 @@ img{
     width: 90vw;
     height: 90vh;
     padding: 5vh 5vw;
-    background: #463931cf;
+    background: #49372ce0;
+    /* background: #463931cf; */
     z-index: 1;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 14px;
@@ -191,7 +205,7 @@ img{
 }
 
 .navbar-item{
-    padding: 10px;
+    padding: 2vw;
     width: 50%;
     height: auto;
     display: flex;
@@ -258,6 +272,7 @@ img{
     cursor: pointer;
     padding: 0 10px;
     display: flex;
+    transition: all 0.3s;
 }
 
 .marbutton:hover{
@@ -268,6 +283,34 @@ img{
 .marbutton__label{
     font-size: large;
 }
+
+.loading-bar{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000000;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.3s;
+}
+
+.loading-bar.hidden{
+    opacity: 0;
+}
+
+.loading-bar__text{
+    font-size: 2em;
+    color: white;
+    margin: 0 0 20px 0;
+    font-family: serif;
+}
+
 
 
 @media only screen and (max-width: 768px) {

@@ -11,8 +11,11 @@ import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
 import { FXAAShader } from 'three/examples/jsm/shaders/FXAAShader.js';
 import { isinpolygon } from '../Utils/isinpolygon'
 
-
 import { Sphere, sRGBEncoding, TextureLoader, Vector2, Vector3 } from 'three';
+
+import { generateName } from '../script/playerAuth'
+
+console.log(generateName());
 
 const Color = require('color');
 
@@ -377,6 +380,13 @@ gltfLoader.load(
     }
 )
 
+function materialClone (gltfmodel){
+    gltfmodel.traverse(function(child){
+        if (child.isMesh) {
+        child.material = child.material.clone()
+    }})
+}
+
 /**
  * Egyptian Test Model
  */
@@ -387,12 +397,14 @@ let egyptianLoaded = false
      '/aeoliscity/Temple/Temple_Administrator.glb',
      (gltf) =>
      {
-         egyptianScene = gltf.scene
+        egyptianScene = gltf.scene
           
-         egyptianScene.scale.set(.3, .3, .3)
-         egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
-         terrGroup.add(egyptianScene)
-         egyptianLoaded = true 
+        egyptianScene.scale.set(.3, .3, .3)
+        egyptianScene.position.set(pos2d.x, (-2118.8256403156556 -1)/3 + 11, pos2d.y +1500)
+        terrGroup.add(egyptianScene)
+        egyptianLoaded = true 
+
+        materialClone(egyptianScene)
 
         let egLight1 = new THREE.SpotLight( 0xffffff, 1.7 );
          egLight1.angle = Math.PI/10;
@@ -440,7 +452,8 @@ let egyptianLoaded = false
     (gltf) =>
     {
         let TempleLibraryScene = gltf.scene
-        TempleLibraryScene.position.set(pos2d.x - 500, (-2118.8256403156556 -1)/3 + 3, pos2d.y + 700)
+        TempleLibraryScene.position.set(pos2d.x - 500, (-2118.8256403156556 -1)/3 - 1, pos2d.y + 700)
+        materialClone(TempleLibraryScene)
         terrGroup.add(TempleLibraryScene)
     }
 )
@@ -452,6 +465,7 @@ gltfLoader.load(
         let TempleMuseumScene = gltf.scene
         TempleMuseumScene.position.set(pos2d.x + 1500, (-2118.8256403156556 -1)/3 - 15 , pos2d.y + 1000)
         TempleMuseumScene.rotation.y = -Math.PI/2;
+        materialClone(TempleMuseumScene)
         terrGroup.add(TempleMuseumScene)
     }
 )
@@ -461,8 +475,10 @@ gltfLoader.load(
     (gltf) =>
     {
         let TemplePyramidScene = gltf.scene
+        console.log(TemplePyramidScene)
         TemplePyramidScene.position.set(pos2d.x + 12000, (-2118.8256403156556 -1)/3 , pos2d.y - 8000)
-        TemplePyramidScene.rotation.y = -Math.PI
+        TemplePyramidScene.rotation.y = - Math.PI 
+        materialClone(TemplePyramidScene)
         terrGroup.add(TemplePyramidScene)
     }
 )
@@ -478,16 +494,52 @@ let shopLoaded = false
      '/aeoliscity/Village/Shop_Simple.glb',
      (gltf) =>
      {
-         shopScene = gltf.scene
-          
-         shopScene.scale.set(1, 1, 1)
-         shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 +1.5 , pos2d.y+30)
-         shopScene.rotation.y = Math.PI/2;
-         terrGroup.add(shopScene)
-         shopLoaded = true 
+        shopScene = gltf.scene
+        materialClone(shopScene)
+        shopScene.scale.set(2.5, 2.5, 2.5)
+        shopScene.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 - 3.5 , pos2d.y + 40)
+        shopScene.rotation.y = Math.PI/2;
+        terrGroup.add(shopScene)
+        shopLoaded = true 
+
+        let shopScene1 = shopScene.clone()
+        materialClone(shopScene1)
+        shopScene1.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 + 0.5 , pos2d.y + 160)
+        terrGroup.add(shopScene1)
+
+        
 
      }
  )
+
+ let VillageRoadScene
+ gltfLoader.load(
+    '/aeoliscity/Village/Village_Road.glb',
+    (gltf) =>
+    {
+       VillageRoadScene = gltf.scene
+       materialClone(VillageRoadScene)
+       VillageRoadScene.scale.set(1, 1, 1)
+       VillageRoadScene.position.set(pos2d.x+ 200, (-2118.8256403156556 -1)/3 + 0.5 , pos2d.y + 10)
+       VillageRoadScene.rotation.y = Math.PI/2;
+
+       for(let i = 5; i < 13; i++){
+            VillageRoadScene = VillageRoadScene.clone()
+            VillageRoadScene.position.set(pos2d.x+ 240, (-2118.8256403156556 -1)/3 -1 +1.5*i , pos2d.y -4 + i * 40)
+            terrGroup.add(VillageRoadScene)
+        }
+     
+
+
+    //    let shopScene1 = shopScene.clone()
+    //    materialClone(shopScene1)
+    //    shopScene1.position.set(pos2d.x+300, (-2118.8256403156556 -1)/3 + 0.5 , pos2d.y + 160)
+    //    terrGroup.add(shopScene1)
+
+       
+
+    }
+)
 
 /**
  * Kapi Neighbor
@@ -516,6 +568,21 @@ let capibaraScene2
     }
 )
 
+let mixer3 = null
+gltfLoader.load(
+    '/aeoliscity/Animals/Animals_Chicken.glb',
+    (gltf) =>
+    {
+        let chickenScene = gltf.scene
+        let chickenAnimation = gltf.animations
+        chickenScene.position.set(pos2d.x - 3, -2118.8256403156556/3 - 0.3 , pos2d.y - 27)
+        unitGroup.add(chickenScene)
+        console.log(gltf.animations)
+        mixer3 = new THREE.AnimationMixer(chickenScene)
+        let action3 = mixer3.clipAction(chickenAnimation[0])
+        action3.play()
+    }
+)
 
 /**
  * Beacon
@@ -625,6 +692,8 @@ window.addEventListener('resize', () =>
     // Update renderer
     renderer.setSize(sizes.width, sizes.height)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    //renderer.localClippingEnabled =true
+    console.log(renderer)
 })
 
 /**
@@ -773,7 +842,7 @@ window.addEventListener('keyup', (event)=>{
  * Camera
  */
 // Base camera 
-const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 0.1, 110 * 1000)
+const camera = new THREE.PerspectiveCamera(40, sizes.width / sizes.height, 1, 110 * 1000)
 scene.add(camera)
 
 
@@ -792,7 +861,7 @@ let kapiMyHouse
 
 
 gltfLoader.load(
-    '/aeoliscity/Village/house_sectioned.glb',
+    '/aeoliscity/Village/house_simple.glb',
     (gltf) =>
     {
         kapiHouseSceneHR = gltf.scene
@@ -802,32 +871,14 @@ gltfLoader.load(
         kapiHouseSceneHR.castShadow = true
         kapiHouseSceneHR.receiveShadow = true
         kapiHouseSceneHRLoaded = true
-        terrGroup.add(kapiHouseSceneHR)
         
-        // Pile position for remove the walls
-        let pilePosition = new THREE.Vector3()
-
-        kapiHouseSceneHR.traverse(function(child){
-            if (child.name.slice(0, 4) == "pile"){
-                ROI_coordinate.push([child.getWorldPosition(pilePosition).x, child.getWorldPosition(pilePosition).z])
-            }
-            if (child.name.slice(0,2) == "2f"){
-                child.material = child.material.clone();
-                secondFloorMaterials.push(child)
-            }
-        });
-
         for(let i = -20; i < 20; i++){
             for (let j = 0; j < 20; j++){
                 kapiHouseClonePosition.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
                 distanceToHouse = camera.position.clone().distanceTo(kapiHouseClonePosition) 
                 if (distanceToHouse < 300){
                     let kapiHouseHRClone = kapiHouseSceneHR.clone()
-                    kapiHouseHRClone.traverse(function(child){
-                        if (child.isMesh) {
-                        child.material = child.material.clone()
-                        }
-                    })
+                    materialClone(kapiHouseHRClone)
                     kapiHouseHRClone.position.set(pos2d.x + i * 55, (-2118.8256403156556 -1)/3 - 8, pos2d.y - 50 - j * 55)
                     terrGroup.add(kapiHouseHRClone)
                 }
@@ -1112,14 +1163,15 @@ const tick = () =>
         //raycaster_far.setFromCamera(new Vector2(0,0), camera)
         raycaster_far.set(camera.position, new THREE.Vector3().copy(capibaraScene.position).sub(camera.position).normalize())
         let intersect = raycaster_far.intersectObjects(terrGroup.children, true )
+        //console.log(capibaraScene.position.distanceTo(camera.position))
         if(intersect && intersect.length > 0){
             intersect.forEach( (intersectEl) => {
-                //if(intersectEl.distance < 0.9*camera.position.distanceTo(capibaraScene.position)){
-                if(intersectEl.distance < 0.8* beaconCamDistance){
+                //if(intersectEl.distance < 0.99 *capibaraScene.position.distanceTo(camera.position)){
+                if(intersectEl.distance <  beaconCamDistance ){
                         intersectEl.object.material.transparent = true;
                     if(intersectEl.object.material.opacity > 0.5){
-                        console.log(intersectEl.object.name)
-                        intersectEl.object.material.opacity = 0.1;
+                        //console.log(intersectEl.object.name)
+                        intersectEl.object.material.opacity = 0.15;
                         intersectEl.object.material.needsUpdate = true;
                         window.setTimeout(()=>{
                             intersectEl.object.material.opacity = 1;
@@ -1129,19 +1181,7 @@ const tick = () =>
                 }
             })
         }
-
-        // if the target position is in the house/is in polygon then invisible the room
-        if(isinpolygon([capibaraScene.position.x, capibaraScene.position.z], ROI_coordinate)){
-            //console.log('isinpolygon')
-            for (let i in secondFloorMaterials){
-                secondFloorMaterials[i].material.visible = false
-            }
-        }else{
-            //console.log('isnot in polygon')
-            for (let i in secondFloorMaterials){
-                secondFloorMaterials[i].material.visible = true
-            }
-        }
+        
 
 
         let newTarget2D = false;
@@ -1200,7 +1240,7 @@ const tick = () =>
                 
                 // kapi running animation
                 if(kapiOnRun!=2){
-                    console.log('kapiOnRun', kapiOnRun)
+                    //console.log('kapiOnRun', kapiOnRun)
                     action.stop()
                     action = mixer.clipAction(capybaraAnimation[3])
                     action.play()
@@ -1224,12 +1264,12 @@ const tick = () =>
             raycaster.set(new THREE.Vector3(pos2d.x, capibaraScene.position.y+ jmpthr , pos2d.y), new THREE.Vector3(0,-1,0))
             let intersect_vertical = raycaster.intersectObjects(terrGroup.children , true );
             if( pos2d.dot(vel) > target2d.dot(vel)){
-                console.log('kapi arrived')
+                //console.log('kapi arrived')
                 kapiOnRun = 0;
             }
             else if(!intersect_vertical || intersect_vertical.length == 0){
                 kapiOnRun = -1;
-                console.log('kapi can not reach target')
+                //console.log('kapi can not reach target')
             }
             
             // check slope
@@ -1257,7 +1297,7 @@ const tick = () =>
                 const travelDist = capibaraScene.position.distanceTo(pos3d);
                 let intersect_view = raycaster.intersectObjects( terrGroup.children, true );
                 if( intersect_view && intersect_view.length != 0 && intersect_view[0].distance < travelDist + jmpthr/2){
-                    console.log("collision with wall")
+                    //console.log("collision with wall")
                     kapiOnRun = -1;
                 }
             }
@@ -1312,6 +1352,10 @@ const tick = () =>
     if(mixer2)
     {
         mixer2.update(deltaTime)
+    }
+    if(mixer3)
+    {
+        mixer3.update(deltaTime)
     }
 
     // Render
