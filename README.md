@@ -3,9 +3,9 @@
 <img width="675" alt="ARESIAN" src="https://user-images.githubusercontent.com/84216960/216922097-83437133-0ce6-4d2a-8287-a66a70e9a922.PNG">
 </p>
 Aresian is a cutting-edge metaverse game that takes you on a journey to the Red Planet. Our team of developers has meticulously crafted virtual cities based on real Martian geographic data, giving players the unique experience of traveling and exploring the Martian landscape.
-<p align="center">
-![landscape](https://user-images.githubusercontent.com/84216960/216923220-f5dbc484-8fd0-479e-95f9-a7f99b5d8b5b.png)
-</p>
+
+https://user-images.githubusercontent.com/84216960/226513942-9d2fd4ff-050e-42ee-8cd6-bf9acef24217.mp4
+
 With Aresian, players will be able to visit the first virtual city of **Aeolis City**, located at Aeolis Palus on Mars, and dive into the rich scientific history of this fascinating region. In the future, players can expect to visit more virtual cities, each with their own unique features and geological wonders to explore.
 
 ## Features
