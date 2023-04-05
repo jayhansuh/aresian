@@ -18,12 +18,13 @@ With Aresian, players will be able to visit the first virtual city of **Aeolis C
 <p align="center">
 <img width="651" alt="Screenshot 2023-02-06 at 2 16 06 AM" src="https://user-images.githubusercontent.com/84216960/216922782-0a564912-4d7a-4b97-bfbf-93775d624f68.png">
 </p>
-To start your journey on Aresian, simply visit our website at [aresian.net](https://aresian.net) and create an account. From there, you can start exploring the virtual cities of Mars and discover the beauty and complexity of the Red Planet.
+
+To start your journey on Aresian, please visit our website at [https://aresian.com](https://aresian.com) and create an account. From there, you can start exploring the virtual cities of Mars and discover the beauty and complexity of the Red Planet.
 
 ## Contributions
-If you are interested in contributing to the development of Aresian, please contact us through our website at [aresian.net](https://aresian.net) or through our social media channels. We welcome all contributions, whether they be in the form of feedback, suggestions, or code.
+If you are interested in contributing to the development of Aresian, please contact us through our website at [https://aresian.com](https://aresian.com) or through our social media channels. We welcome all contributions, whether they be in the form of feedback, suggestions, or code.
 
 ## Contact Us
-For more information or to get in touch with our team, please visit our website at [aresian.net](https://aresian.net) or reach out to us through our social media channels. We are always here to help and answer any questions you may have.
+For more information or to get in touch with our team, please visit our website at [https://aresian.com](https://aresian.com). or reach out to us through our social media channels. We are always here to help and answer any questions you may have.
 
 Join us on Aresian, and let's explore the wonders of Mars together!
